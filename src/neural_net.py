@@ -2,7 +2,7 @@ import numpy as np
 import torch.nn as nn
 import torch
 
-from library_function import library_1D, library_kinetic
+from library_function import *
 
 def LinNetwork(network_config): # network config
     
@@ -35,7 +35,9 @@ def Training(data, target, optim_config, library_config, network, network_config
         
         # Calculate the predicted y-value, construct the library function
         prediction = network(data)    
-        y_t, theta = library_kinetic(data, prediction,library_config)
+        y_t, theta = library_1D_2Dout(data, prediction,library_config)
+        print(y_t.shape)
+        print(theta.shape)
         f = y_t - theta @ weight_vector
 
         # Losses: MSE, PI and L1  
@@ -61,7 +63,7 @@ def Training(data, target, optim_config, library_config, network, network_config
     return y_t, theta, weight_vector
 
 
-def Final_Training(data, target, optim_config, library_config, network, sparse_weight_vector, sparsity_mask):
+def Final_Training(data, target, optim_config, library_config, network, network_config, sparse_weight_vector, sparsity_mask):
     
     max_it = 5000
     
@@ -72,11 +74,12 @@ def Final_Training(data, target, optim_config, library_config, network, sparse_w
         
         # Calculate the predicted y-value, construct the sparse library function
         prediction = network(data)    
-        y_t, theta = library_kinetic(data, prediction,library_config)
-        print(sparsity_mask.shape)
-        print(theta.shape)
-        theta_sparse = theta[:, sparsity_mask]
-        f = y_t - theta_sparse @ sparse_weight_vector
+        y_t, theta = library_1D_2Dout(data, prediction,library_config)
+
+        dummy = torch.zeros((library_config['total_terms']*network_config['output_dim'],1))
+        dummy[sparsity_mask] = sparse_weight_vector
+        dummy = dummy.reshape(library_config['total_terms'], network_config['output_dim'])
+        f = y_t - theta @ dummy
         
         # Losses: MSE, PI and L1  
         loss_MSE = torch.nn.MSELoss()(prediction, target)

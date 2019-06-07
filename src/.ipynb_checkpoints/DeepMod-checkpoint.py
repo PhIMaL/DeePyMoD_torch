@@ -22,7 +22,7 @@ def DeepMod(data, target, network_config, library_config, optim_config):
     print(sparsity_mask)
     
     # Final Training without L1 and with the sparsity pattern
-    sparse_weight_vector, prediction = Final_Training(data, target, optim_config, library_config, network, sparse_weight_vector, sparsity_mask)
+    sparse_weight_vector, prediction = Final_Training(data, target, optim_config, library_config, network, network_config, sparse_weight_vector, sparsity_mask)
     
     return sparse_weight_vector, sparsity_mask, prediction, network
 
