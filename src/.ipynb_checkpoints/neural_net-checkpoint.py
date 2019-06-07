@@ -36,8 +36,6 @@ def Training(data, target, optim_config, library_config, network, network_config
         # Calculate the predicted y-value, construct the library function
         prediction = network(data)    
         y_t, theta = library_1D_2Dout(data, prediction,library_config)
-        print(y_t.shape)
-        print(theta.shape)
         f = y_t - theta @ weight_vector
 
         # Losses: MSE, PI and L1  
@@ -58,7 +56,7 @@ def Training(data, target, optim_config, library_config, network, network_config
             print('Epoch | Total loss | MSE | PI | L1 ')
         if iteration % 1000 == 0:
             print(iteration, "%.1E" % loss.detach().numpy(), "%.1E" % loss_MSE.detach().numpy(), "%.1E" % loss_PI.detach().numpy(), "%.1E" % loss_L1.detach().numpy())
-            print(np.around(weight_vector.detach().numpy(),decimals=2).reshape(1,-1))
+            print(np.around(weight_vector.detach().numpy(),decimals=2))
             
     return y_t, theta, weight_vector
 
