@@ -2,8 +2,8 @@ import numpy as np
 import torch.nn as nn
 import torch
 
-from library_function import library_1D
-from neural_net import LinNetwork, Training, Final_Training
+from library_function import *
+from neural_net import *
 from sparsity import scaling, threshold
 
 def DeepMod(data, target, network_config, library_config, optim_config):   
@@ -26,3 +26,34 @@ def DeepMod(data, target, network_config, library_config, optim_config):
     
     return sparse_weight_vector, sparsity_mask, prediction, network
 
+def DeepMod_mse(data, target, network_config, optim_config):   
+    
+    # Initiate neural network, weight_vector and optimizer:
+    network = LinNetwork(network_config)    
+    
+    # Training of the network
+    prediction, network = Training_MSE(data, target, optim_config, network, network_config)
+
+    
+    return prediction, network
+
+
+def DeepMod_pretrained_nomse(data, target, network_config, library_config, optim_config, network):   
+    
+    # Initiate neural network, weight_vector and optimizer:    
+    
+    # Training of the network
+    y_t,theta, weight_vector = Training(data, target, optim_config, library_config, network, network_config)
+
+    
+    return prediction, y_t,theta, weight_vector
+
+def DeepMod_pretrained_nomse(data, target, network_config, library_config, optim_config, network,init_coeff):   
+    
+    # Initiate neural network, weight_vector and optimizer:    
+    
+    # Training of the network
+    y_t,theta, weight_vector = Training_PI(data, target, optim_config, library_config, network, network_config,init_coeff)
+
+    
+    return  y_t,theta, weight_vector

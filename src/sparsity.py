@@ -9,8 +9,8 @@ def scaling(y_t, theta, weight_vector):
     return scaled_weight_vector
 
 def threshold(scaled_weight_vector, weight_vector):
-    sparsity  = torch.where(torch.abs(scaled_weight_vector) > torch.std(scaled_weight_vector), scaled_weight_vector, torch.zeros_like(scaled_weight_vector))
-    
+    sparsity  = torch.where(torch.abs(scaled_weight_vector) > torch.std(scaled_weight_vector, dim=0), scaled_weight_vector, torch.zeros_like(scaled_weight_vector))
+    print('std',torch.std(scaled_weight_vector, dim=0))
     print('sparsity',sparsity)
     sparsity_mask  = torch.nonzero(torch.reshape(sparsity,(1,-1)))[:,1]
     
