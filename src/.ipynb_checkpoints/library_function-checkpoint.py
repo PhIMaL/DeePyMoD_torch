@@ -40,13 +40,35 @@ def library_kinetic(data, prediction,library_config):
     v = prediction[:,1:2]
     du = grad(u, data, grad_outputs=torch.ones_like(u), create_graph=True)[0]
     u_t = du[:, 0:1]
+  #  ddu = grad(u_t, data, grad_outputs=torch.ones_like(u), create_graph=True)[0]
+  #  u_tt = ddu[:,0:1]
     
     dv = grad(v, data, grad_outputs=torch.ones_like(v), create_graph=True)[0]
     v_t = dv[:, 0:1]
+  # ddv = grad(v_t, data, grad_outputs=torch.ones_like(u), create_graph=True)[0]
+  #  v_tt = ddv[:,0:1]
     
-    theta = torch.cat([torch.ones_like(u), u, v], dim=1)
-    print(torch.cat((u_t,v_t), dim=1))
+    theta = torch.cat([torch.ones_like(u), u, v, u*v], dim=1)
+   
     return  torch.cat((u_t,v_t), dim=1), theta 
+
+
+def library_kinetic_1D(data, prediction,library_config):
+    
+    u = prediction[:,0:1] 
+    du = grad(u, data, grad_outputs=torch.ones_like(u), create_graph=True)[0]
+    u_t = du[:, 0:1]
+    
+    theta = torch.cat([torch.ones_like(u), u, u*u], dim=1)
+   
+    return  u_t, theta 
+
+
+
+
+####### Non-working libraries
+
+
 
 def library_1D_2Dout(data, prediction,library_config):
    
