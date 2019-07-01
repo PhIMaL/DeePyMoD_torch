@@ -33,39 +33,38 @@ def train(data, target, network, coeff_vector, library_config, optim_config):
     Trains deepmod NN.
     '''
 
-    max_it = optim_config['max_iterations']
+    max_iterations = optim_config['max_iterations']
     l1 = optim_config['lambda']
     library_function = library_config['type']
 
     optimizer = torch.optim.Adam([{'params': network.parameters()}, {'params': coeff_vector}])
 
-    for iteration in np.arange(max_it):
-
-        # Calculate the predicted y-value, construct the library function
+    # Training
+    print('Epoch | Total loss | MSE | PI | L1 ')
+    for iteration in np.arange(max_iterations):
+        # Calculating prediction and library
         prediction = network(data)
-        y_t, theta = library_function(data, prediction,library_config)
+        y_t, theta = library_function(data, prediction, library_config)
         f = y_t - theta @ coeff_vector
 
-        # Losses: MSE, PI and L1
+        # Scaling
+        coeff_vector_scaled = coeff_vector * (torch.norm(theta, dim=0)[:, None] / torch.norm(y_t, dim=0))
 
+        # Calculating losses
         loss_MSE = torch.nn.MSELoss()(prediction, target)
-        loss_PI = torch.nn.MSELoss()(f, torch.zeros_like(y_t))
-        loss_L1 = l1*nn.L1Loss()(coeff_vector,torch.zeros_like(coeff_vector))
-
-        # Combine all the losses
+        loss_PI = torch.nn.MSELoss()(f, torch.zeros_like(f))
+        loss_L1 = l1 * torch.sum(torch.abs(coeff_vector_scaled))
         loss = loss_MSE + loss_PI + loss_L1
 
-        # Optimizwe step
+        # Optimizer step
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
 
-        # Print the losses during training
-        if iteration == 0:
-            print('Epoch | Total loss | MSE | PI | L1 ')
+        # Printing
         if iteration % 1000 == 0:
             print(iteration, "%.1E" % loss.detach().numpy(), "%.1E" % loss_MSE.detach().numpy(), "%.1E" % loss_PI.detach().numpy(), "%.1E" % loss_L1.detach().numpy())
-            print(np.around(coeff_vector.detach().numpy(),decimals=2))
+            print(np.around(coeff_vector.detach().numpy(), decimals=2))
 
     return y_t, theta, coeff_vector
 
