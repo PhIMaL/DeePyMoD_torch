@@ -7,13 +7,13 @@ from neural_net import *
 from sparsity import scaling, threshold
 
 
-def DeepMod(data, target, network_config, library_type, library_config, optim_config):   
+def DeepMod(data, target, network_config, library_type, library_config, optim_config, init_coef):   
     
     # Initiate neural network, weight_vector and optimizer:
     network = LinNetwork(network_config)    
     
     # Training of the network
-    y_t,theta, weight_vector = Training(data, target, optim_config, library_type, library_config, network, network_config)
+    y_t,theta, weight_vector = Training(data, target, optim_config, library_type, library_config, network, network_config, init_coef)
     
     # Scaling
     scaled_weight_vector = scaling(y_t,theta, weight_vector)

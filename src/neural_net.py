@@ -26,8 +26,8 @@ def Training(data, target, optim_config, library_type, library_config, network, 
     
     max_it = optim_config['max_iteration']
     l1 = optim_config['lambda']
-    weight_vector = init_coef
     
+    weight_vector = init_coef
     # Initialize the weight vector and optimizer 
     
     optimizer = torch.optim.Adam([{'params':network.parameters()}, {'params': weight_vector}])
@@ -36,8 +36,9 @@ def Training(data, target, optim_config, library_type, library_config, network, 
         
         # Calculate the predicted y-value, construct the library function
         prediction = network(data)    
-        y_t, theta = library_type(data, prediction,library_config)
-        f = y_t - theta @ weight_vector
+        if optim_config['type'] == PI or Single:
+            y_t, theta = library_type(data, prediction,library_config)
+            f = y_t - theta @ weight_vector
 
         # Losses: MSE, PI and L1  
 

@@ -27,7 +27,6 @@ def Training(data, target, optim_config, library_type, library_config, network, 
     max_it = optim_config['max_iteration']
     l1 = optim_config['lambda']
     weight_vector = init_coef
-    
     # Initialize the weight vector and optimizer 
     
     optimizer = torch.optim.Adam([{'params':network.parameters()}, {'params': weight_vector}])
