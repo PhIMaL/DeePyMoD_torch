@@ -2,33 +2,29 @@ import numpy as np
 import torch.nn as nn
 import torch
 
-from library_function import *
-from neural_net import *
+from neural_net import network_init, train
 from sparsity import scaling, threshold
 
 
-def DeepMod(data, target, network_config, library_type, library_config, optim_config, coeff_vec):
-
-    # Initiate neural network, weight_vector and optimizer:
+def DeepMoD(data, target, network_config, library_config, optim_config):
+    # Initiating
     network = network_init(network_config)
+    coeff_vector = torch.randn((library_config['total_terms'], 1), dtype=torch.float32, requires_grad=True)
 
     # Training of the network
-    y_t, theta, weight_vector = train(data, target, network, coeff_vec, library_config, optim_config)
-
-    # Scaling
-    scaled_weight_vector = scaling(y_t,theta, weight_vector)
-    print(scaled_weight_vector)
+    time_deriv, theta, weight_vector = train(data, target, network, coeff_vector, library_config, optim_config)
 
     # Thresholding
-    sparse_weight_vector, sparsity_mask =  threshold(scaled_weight_vector,weight_vector)
-    print(sparsity_mask)
+    scaled_coeff_vector = scaling(weight_vector, theta, time_deriv)
+    sparse_coeff_vector, sparsity_mask = threshold(scaled_coeff_vector, coeff_vector)
+    print(coeff_vector, sparse_coeff_vector, sparsity_mask)
 
     # Final Training without L1 and with the sparsity pattern
-    sparse_weight_vector, prediction = Final_Training(data, target, optim_config, library_config, network, network_config, sparse_weight_vector, sparsity_mask)
+    #sparse_weight_vector, prediction = Final_Training(data, target, optim_config, library_config, network, network_config, sparse_weight_vector, sparsity_mask)
 
-    return sparse_weight_vector, sparsity_mask, prediction, network
+    return sparse_coeff_vector, sparsity_mask, network
 
-
+'''
 def DeepMod_mse(data, target, network_config, library_type, library_config, optim_config):
 
     # Initiate neural network, weight_vector and optimizer:
@@ -57,3 +53,4 @@ def DeepMod_single(data, target, network_config, library_type, library_config, o
 
 
     return  y_t,theta, weight_vector
+'''

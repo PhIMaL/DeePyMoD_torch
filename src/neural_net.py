@@ -2,7 +2,6 @@ import numpy as np
 import torch.nn as nn
 import torch
 
-from library_function import *
 from sparsity import scaling
 
 
@@ -69,7 +68,7 @@ def train(data, target, network, coeff_vector, library_config, optim_config):
 
     return time_deriv, theta, coeff_vector
 
-
+'''
 def Final_Training(data, target, optim_config, library_type, library_config, network, network_config, sparse_weight_vector, sparsity_mask):
 
     max_it = 5000
@@ -178,3 +177,4 @@ def Training_PI(data, target, optim_config, library_type, library_config, networ
             print(np.around(weight_vector.detach().numpy(),decimals=2))
 
     return y_t, theta, weight_vector
+'''
