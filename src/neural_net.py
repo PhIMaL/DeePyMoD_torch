@@ -3,6 +3,7 @@ import torch.nn as nn
 import torch
 
 from library_function import *
+from sparsity import scaling
 
 
 def network_init(network_config):
@@ -44,11 +45,11 @@ def train(data, target, network, coeff_vector, library_config, optim_config):
     for iteration in np.arange(max_iterations):
         # Calculating prediction and library
         prediction = network(data)
-        y_t, theta = library_function(data, prediction, library_config)
-        f = y_t - theta @ coeff_vector
+        time_deriv, theta = library_function(data, prediction, library_config)
+        f = time_deriv - theta @ coeff_vector
 
         # Scaling
-        coeff_vector_scaled = coeff_vector * (torch.norm(theta, dim=0)[:, None] / torch.norm(y_t, dim=0))
+        coeff_vector_scaled = scaling(coeff_vector, theta, time_deriv)
 
         # Calculating losses
         loss_MSE = torch.nn.MSELoss()(prediction, target)
@@ -66,7 +67,7 @@ def train(data, target, network, coeff_vector, library_config, optim_config):
             print(iteration, "%.1E" % loss.detach().numpy(), "%.1E" % loss_MSE.detach().numpy(), "%.1E" % loss_PI.detach().numpy(), "%.1E" % loss_L1.detach().numpy())
             print(np.around(coeff_vector.detach().numpy(), decimals=2))
 
-    return y_t, theta, coeff_vector
+    return time_deriv, theta, coeff_vector
 
 
 def Final_Training(data, target, optim_config, library_type, library_config, network, network_config, sparse_weight_vector, sparsity_mask):
