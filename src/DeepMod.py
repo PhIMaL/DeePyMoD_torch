@@ -1,5 +1,3 @@
-import numpy as np
-import torch.nn as nn
 import torch
 
 from neural_net import network_init, train
