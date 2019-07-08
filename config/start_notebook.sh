@@ -37,5 +37,5 @@ if [ "$(docker ps -aq -f name=$container_name)" ]; then
 fi
 
 # Also create a nice stop script
-echo "You can stop this container by running stop_notebook.sh"\
+echo "You can stop this container by running stop_notebook.sh"
 echo "docker stop $container_name" > stop_notebook.sh
