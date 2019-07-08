@@ -3,6 +3,8 @@ import torch
 from deepymod_torch.library_function import library_1D_in, library_1D
 from deepymod_torch.DeepMod import DeepMoD
 
+torch.set_default_tensor_type('torch.cuda.FloatTensor') # enable for gpu.
+
 np.random.seed(42)
 number_of_samples = 1000
 
