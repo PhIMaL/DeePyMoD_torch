@@ -2,7 +2,7 @@ import numpy as np
 import torch.nn as nn
 import torch
 
-from sparsity import scaling
+from deepymod_torch.sparsity import scaling
 
 
 def deepmod_init(network_config, library_config):

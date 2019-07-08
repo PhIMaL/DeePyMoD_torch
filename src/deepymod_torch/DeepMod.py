@@ -1,7 +1,7 @@
 import torch
 
-from neural_net import deepmod_init, train
-from sparsity import scaling, threshold
+from deepymod_torch.neural_net import deepmod_init, train
+from deepymod_torch.sparsity import scaling, threshold
 
 
 def DeepMoD(data, target, network_config, library_config, optim_config):

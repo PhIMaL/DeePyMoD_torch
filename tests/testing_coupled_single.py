@@ -1,14 +1,12 @@
-import sys
-sys.path.append('src/')
 import numpy as np
 import torch
-from library_function import library_1D_in, library_1D
-from DeepMod import DeepMoD
+from deepymod_torch.library_function import library_1D_in, library_1D
+from deepymod_torch.DeepMod import DeepMoD
 
 np.random.seed(42)
 number_of_samples = 1000
 
-data = np.load('data/burgers.npy', allow_pickle=True).item()
+data = np.load('../data/processed/burgers.npy', allow_pickle=True).item()
 
 X = np.transpose((data['x'].flatten(), data['t'].flatten()))
 y = np.real(data['u']).reshape((data['u'].size, 1))
