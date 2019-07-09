@@ -18,6 +18,7 @@ idx = np.random.permutation(y.shape[0])
 X_train = torch.tensor(X[idx, :][:number_of_samples], dtype=torch.float32, requires_grad=True)
 y_train = torch.tensor(y[idx, :][:number_of_samples], dtype=torch.float32)
 
+
 optim_config = {'lambda': 10**-6, 'max_iterations': 25000}
 lib_config = {'type': library_1D_in, 'poly_order': 2, 'diff_order': 2}
 network_config = {'input_dim': 2, 'hidden_dim': 20, 'layers': 5, 'output_dim': 2}

@@ -17,11 +17,12 @@ idx = np.random.permutation(y.size)
 X_train = torch.tensor(X[idx, :][:number_of_samples], dtype=torch.float32, requires_grad=True)
 y_train = torch.tensor(y[idx, :][:number_of_samples], dtype=torch.float32)
 
-optim_config = {'lambda': 10**-6, 'max_iterations': 15000}
-lib_config = {'type': library_1D_in, 'poly_order': 2, 'diff_order': 3}
+optim_config = {'lambda': 10**-6, 'max_iterations': 1000}
+lib_config = {'type': library_1D_in, 'poly_order': 1, 'diff_order': 2}
 network_config = {'input_dim': 2, 'hidden_dim': 20, 'layers': 5, 'output_dim': 1}
 
 
 sparse_coeff_vector, sparsity_mask, network = DeepMoD(X_train, y_train, network_config, lib_config, optim_config)
 
+print('Final result:')
 print(sparse_coeff_vector, sparsity_mask)
