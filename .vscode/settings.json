@@ -1,0 +1,7 @@
+{
+    "python.pythonPath": "/opt/conda/bin/python",
+    "python.linting.flake8Enabled": true,
+    "python.linting.pylintEnabled": false,
+    "python.linting.pep8Enabled": false,
+    "python.linting.enabled": true
+}
