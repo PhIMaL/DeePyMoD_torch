@@ -47,8 +47,8 @@ def train(data, target, network, coeff_vector_list, sparsity_mask_list, library_
     l1 = optim_config['lambda']
     library_function = library_config['type']
 
-    optimizer = torch.optim.Adam([{'params': network.parameters()}, {'params': coeff_vector_list}])
-
+    optimizer = torch.optim.Adam([{'params': network.parameters(), 'lr': 0.002}, {'params': coeff_vector_list, 'lr': 0.002}])
+  
     # Training
     print('Epoch | Total loss | MSE | PI | L1 ')
     for iteration in np.arange(max_iterations):
@@ -82,8 +82,8 @@ def train(data, target, network, coeff_vector_list, sparsity_mask_list, library_
 
         # Printing
         if iteration % 500 == 0:
-            print(iteration, "%.1E" % loss.detach().numpy(), "%.1E" % loss_MSE.detach().numpy(), "%.1E" % loss_reg.detach().numpy(), "%.1E" % loss_l1.detach().numpy())
-            for coeff_vector in coeff_vector_list:
-                print(np.around(coeff_vector.detach().numpy(), decimals=2))
+            print(iteration, "%.1E" % loss.item(), "%.1E" % loss_MSE.item(), "%.1E" % loss_reg.item(), "%.1E" % loss_l1.item())
+            for coeff_vector in zip(coeff_vector_list, coeff_vector_scaled_list):
+                print(coeff_vector[0])
 
     return time_deriv_list, theta, coeff_vector_list
