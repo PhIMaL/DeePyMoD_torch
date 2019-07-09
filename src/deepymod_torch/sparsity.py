@@ -10,7 +10,7 @@ def scaling(weight_vector, library, time_deriv):
 
 def threshold(scaled_coeff_vector, coeff_vector):
     sparse_coeff_vector = torch.where(torch.abs(scaled_coeff_vector) > torch.std(scaled_coeff_vector, dim=0), coeff_vector, torch.zeros_like(scaled_coeff_vector))
-    sparsity_mask = torch.nonzero(sparse_coeff_vector)[:, 0]
-    sparse_coeff_vector = sparse_coeff_vector[sparsity_mask].detach()
+    sparsity_mask = torch.nonzero(sparse_coeff_vector)[:, 0].detach()
+    sparse_coeff_vector = sparse_coeff_vector[sparsity_mask].clone().detach().requires_grad_(True) # so it can be optimized
 
-    return scaled_coeff_vector, sparsity_mask
+    return sparse_coeff_vector, sparsity_mask
