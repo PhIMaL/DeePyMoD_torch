@@ -86,6 +86,10 @@ def train(data, target, network, coeff_vector_list, sparsity_mask_list, library_
         # Tensorboard stuff
         if iteration % 50 == 0:
             writer.add_scalar('Total loss', loss, iteration)
+            for idx in np.arange(len(MSE_cost_list)):
+                writer.add_scalar('MSE '+str(idx), MSE_cost_list[idx], iteration)
+                writer.add_scalar('Regression '+str(idx), reg_cost_list[idx], iteration)
+                writer.add_scalar('L1 '+str(idx), l1_cost_list[idx], iteration)
 
         # Printing
         if iteration % 500 == 0:
