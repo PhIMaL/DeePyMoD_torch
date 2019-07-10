@@ -52,9 +52,14 @@ def train(data, target, network, coeff_vector_list, sparsity_mask_list, library_
 
     # preparing tensorboard writer
     writer = SummaryWriter()
-    writer.add_custom_scalars({'Costs': {'MSE': ['Multiline', ['MSE_' + str(idx) for idx in np.arange(len(coeff_vector_list))]],
-                                         'Regression': ['Multiline', ['Regression_' + str(idx) for idx in np.arange(len(coeff_vector_list))]],
-                                         'L1': ['Multiline', ['L1_' + str(idx) for idx in np.arange(len(coeff_vector_list))]]}})
+    custom_board = {'Costs': {'MSE': ['Multiline', ['MSE_' + str(idx) for idx in np.arange(len(coeff_vector_list))]],
+                              'Regression': ['Multiline', ['Regression_' + str(idx) for idx in np.arange(len(coeff_vector_list))]],
+                              'L1': ['Multiline', ['L1_' + str(idx) for idx in np.arange(len(coeff_vector_list))]]}, 'Coefficients': {}, 'Scaled coefficients': {}}
+    for idx in np.arange(len(coeff_vector_list)):
+        custom_board['Coefficients']['Vector_' + str(idx)] = ['Multiline', ['coeff_' + str(idx) + '_' + str(element_idx) for element_idx in np.arange(coeff_vector_list[idx].shape[0])]]
+        custom_board['Scaled coefficients']['Vector_' + str(idx)] = ['Multiline', ['scaled_coeff_' + str(idx) + '_' + str(element_idx) for element_idx in np.arange(coeff_vector_list[idx].shape[0])]]
+
+    writer.add_custom_scalars(custom_board)
 
 
     # Training
@@ -99,11 +104,11 @@ def train(data, target, network, coeff_vector_list, sparsity_mask_list, library_
 
                 # Coefficients
                 for element_idx, element in enumerate(torch.unbind(coeff_vector_list[idx])):
-                    writer.add_scalar('coeff '+ str(idx) + ' ' + str(element_idx), element, iteration)
+                    writer.add_scalar('coeff ' + str(idx) + ' ' + str(element_idx), element, iteration)
 
                 # Scaled coefficients
                 for element_idx, element in enumerate(torch.unbind(coeff_vector_scaled_list[idx])):
-                    writer.add_scalar('coeff '+ str(idx) + ' ' + str(element_idx), element, iteration)
+                    writer.add_scalar('scaled_coeff ' + str(idx) + ' ' + str(element_idx), element, iteration)
 
 
         # Printing
