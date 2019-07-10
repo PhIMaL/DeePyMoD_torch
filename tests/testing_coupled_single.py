@@ -1,6 +1,6 @@
 import numpy as np
 import torch
-from deepymod_torch.library_function import library_1D_in, library_1D
+from deepymod_torch.library_function import library_1D_in
 from deepymod_torch.DeepMod import DeepMoD
 
 torch.set_default_tensor_type('torch.cuda.FloatTensor')  # enable for gpu.
@@ -17,7 +17,7 @@ idx = np.random.permutation(y.size)
 X_train = torch.tensor(X[idx, :][:number_of_samples], dtype=torch.float32, requires_grad=True)
 y_train = torch.tensor(y[idx, :][:number_of_samples], dtype=torch.float32)
 
-optim_config = {'lambda': 10**-6, 'max_iterations': 1000}
+optim_config = {'lambda': 10**-6, 'max_iterations': 10000}
 lib_config = {'type': library_1D_in, 'poly_order': 1, 'diff_order': 2}
 network_config = {'input_dim': 2, 'hidden_dim': 20, 'layers': 5, 'output_dim': 1}
 

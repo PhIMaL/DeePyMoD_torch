@@ -3,6 +3,7 @@ import torch.nn as nn
 import torch
 
 from deepymod_torch.sparsity import scaling
+from torch.utils.tensorboard import SummaryWriter
 
 
 def deepmod_init(network_config, library_config):
@@ -48,7 +49,9 @@ def train(data, target, network, coeff_vector_list, sparsity_mask_list, library_
     library_function = library_config['type']
 
     optimizer = torch.optim.Adam([{'params': network.parameters(), 'lr': 0.002}, {'params': coeff_vector_list, 'lr': 0.002}])
-  
+    # preparing tensorboard writer
+    writer = SummaryWriter()
+
     # Training
     print('Epoch | Total loss | MSE | PI | L1 ')
     for iteration in np.arange(max_iterations):
@@ -80,10 +83,15 @@ def train(data, target, network, coeff_vector_list, sparsity_mask_list, library_
         loss.backward()
         optimizer.step()
 
+        # Tensorboard stuff
+        if iteration % 50 == 0:
+            writer.add_scalar('Total loss', loss, iteration)
+
         # Printing
         if iteration % 500 == 0:
             print(iteration, "%.1E" % loss.item(), "%.1E" % loss_MSE.item(), "%.1E" % loss_reg.item(), "%.1E" % loss_l1.item())
             for coeff_vector in zip(coeff_vector_list, coeff_vector_scaled_list):
                 print(coeff_vector[0])
-
+    
+    writer.close()
     return time_deriv_list, theta, coeff_vector_list
