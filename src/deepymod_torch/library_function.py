@@ -54,27 +54,3 @@ def library_1D_in(data, prediction, library_config):
         theta_udu = torch.cat([torch.matmul(u[:, 1:, None], du[:, None, 1:]).view(samples, (poly_list[0].shape[1]-1) * (deriv_list[0].shape[1]-1)) for u, dv in product(poly_list, deriv_list)], 1)
         theta = torch.cat([theta_uv, theta_dudv, theta_udu], dim=1)
     return time_deriv_list, theta
-
-
-def library_1D(data, prediction, library_config):
-    max_order = library_config['poly_order']
-    max_diff = library_config['diff_order']
-
-    u = torch.ones_like(prediction)
-    for order in np.arange(1, max_order+1):
-        u = torch.cat((u, u[:, order-1:order] * prediction), dim=1)
-
-    # Calculate the derivatives
-    dy = grad(prediction, data, grad_outputs=torch.ones_like(prediction), create_graph=True)[0]
-    y_t = dy[:, 0:1]
-    y_x = dy[:, 1:2]
-
-    du = torch.cat((torch.ones_like(y_x), y_x), dim=1)
-    for order in np.arange(2, max_diff+1):
-        du = torch.cat((du, grad(du[:, order-1:order], data, grad_outputs=torch.ones_like(prediction), create_graph=True)[0][:, 1:2]), dim=1)
-
-    # Constructing Theta
-    theta = torch.matmul(u[:, :, None], du[:, None, :])
-    theta = theta.view(theta.shape[0], theta.shape[1] * theta.shape[2])
-
-    return [y_t], theta

@@ -1,6 +1,6 @@
 import numpy as np
 import torch
-from deepymod_torch.library_function import library_1D_in, library_1D
+from deepymod_torch.library_function import library_1D_in
 from deepymod_torch.DeepMod import DeepMoD
 from scipy.io import loadmat
 
