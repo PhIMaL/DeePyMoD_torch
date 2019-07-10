@@ -49,8 +49,13 @@ def train(data, target, network, coeff_vector_list, sparsity_mask_list, library_
     library_function = library_config['type']
 
     optimizer = torch.optim.Adam([{'params': network.parameters(), 'lr': 0.002}, {'params': coeff_vector_list, 'lr': 0.002}])
+
     # preparing tensorboard writer
     writer = SummaryWriter()
+    writer.add_custom_scalars({'Costs': {'MSE': ['Multiline', ['MSE_' + str(idx) for idx in np.arange(len(coeff_vector_list))]],
+                                         'Regression': ['Multiline', ['Regression_' + str(idx) for idx in np.arange(len(coeff_vector_list))]],
+                                         'L1': ['Multiline', ['L1_' + str(idx) for idx in np.arange(len(coeff_vector_list))]]}})
+
 
     # Training
     print('Epoch | Total loss | MSE | PI | L1 ')
@@ -87,9 +92,19 @@ def train(data, target, network, coeff_vector_list, sparsity_mask_list, library_
         if iteration % 50 == 0:
             writer.add_scalar('Total loss', loss, iteration)
             for idx in np.arange(len(MSE_cost_list)):
+                # Costs
                 writer.add_scalar('MSE '+str(idx), MSE_cost_list[idx], iteration)
                 writer.add_scalar('Regression '+str(idx), reg_cost_list[idx], iteration)
                 writer.add_scalar('L1 '+str(idx), l1_cost_list[idx], iteration)
+
+                # Coefficients
+                for element_idx, element in enumerate(torch.unbind(coeff_vector_list[idx])):
+                    writer.add_scalar('coeff '+ str(idx) + ' ' + str(element_idx), element, iteration)
+
+                # Scaled coefficients
+                for element_idx, element in enumerate(torch.unbind(coeff_vector_scaled_list[idx])):
+                    writer.add_scalar('coeff '+ str(idx) + ' ' + str(element_idx), element, iteration)
+
 
         # Printing
         if iteration % 500 == 0:
