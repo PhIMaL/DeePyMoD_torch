@@ -1,6 +1,6 @@
 import numpy as np
 import torch
-from deepymod_torch.library_function import library_1D_in, library_1D
+from deepymod_torch.library_function import library_1D_in
 from deepymod_torch.DeepMod import DeepMoD
 
 torch.set_default_tensor_type('torch.cuda.FloatTensor')  # enable for gpu.

@@ -3,6 +3,7 @@ import torch.nn as nn
 import torch
 
 from deepymod_torch.sparsity import scaling
+from torch.utils.tensorboard import SummaryWriter
 
 
 def deepmod_init(network_config, library_config):
@@ -48,7 +49,19 @@ def train(data, target, network, coeff_vector_list, sparsity_mask_list, library_
     library_function = library_config['type']
 
     optimizer = torch.optim.Adam([{'params': network.parameters(), 'lr': 0.002}, {'params': coeff_vector_list, 'lr': 0.002}])
-  
+
+    # preparing tensorboard writer
+    writer = SummaryWriter()
+    custom_board = {'Costs': {'MSE': ['Multiline', ['MSE_' + str(idx) for idx in np.arange(len(coeff_vector_list))]],
+                              'Regression': ['Multiline', ['Regression_' + str(idx) for idx in np.arange(len(coeff_vector_list))]],
+                              'L1': ['Multiline', ['L1_' + str(idx) for idx in np.arange(len(coeff_vector_list))]]}, 'Coefficients': {}, 'Scaled coefficients': {}}
+    for idx in np.arange(len(coeff_vector_list)):
+        custom_board['Coefficients']['Vector_' + str(idx)] = ['Multiline', ['coeff_' + str(idx) + '_' + str(element_idx) for element_idx in np.arange(coeff_vector_list[idx].shape[0])]]
+        custom_board['Scaled coefficients']['Vector_' + str(idx)] = ['Multiline', ['scaled_coeff_' + str(idx) + '_' + str(element_idx) for element_idx in np.arange(coeff_vector_list[idx].shape[0])]]
+
+    writer.add_custom_scalars(custom_board)
+
+
     # Training
     print('Epoch | Total loss | MSE | PI | L1 ')
     for iteration in np.arange(max_iterations):
@@ -80,10 +93,29 @@ def train(data, target, network, coeff_vector_list, sparsity_mask_list, library_
         loss.backward()
         optimizer.step()
 
+        # Tensorboard stuff
+        if iteration % 50 == 0:
+            writer.add_scalar('Total loss', loss, iteration)
+            for idx in np.arange(len(MSE_cost_list)):
+                # Costs
+                writer.add_scalar('MSE '+str(idx), MSE_cost_list[idx], iteration)
+                writer.add_scalar('Regression '+str(idx), reg_cost_list[idx], iteration)
+                writer.add_scalar('L1 '+str(idx), l1_cost_list[idx], iteration)
+
+                # Coefficients
+                for element_idx, element in enumerate(torch.unbind(coeff_vector_list[idx])):
+                    writer.add_scalar('coeff ' + str(idx) + ' ' + str(element_idx), element, iteration)
+
+                # Scaled coefficients
+                for element_idx, element in enumerate(torch.unbind(coeff_vector_scaled_list[idx])):
+                    writer.add_scalar('scaled_coeff ' + str(idx) + ' ' + str(element_idx), element, iteration)
+
+
         # Printing
         if iteration % 500 == 0:
             print(iteration, "%.1E" % loss.item(), "%.1E" % loss_MSE.item(), "%.1E" % loss_reg.item(), "%.1E" % loss_l1.item())
             for coeff_vector in zip(coeff_vector_list, coeff_vector_scaled_list):
                 print(coeff_vector[0])
-
+    
+    writer.close()
     return time_deriv_list, theta, coeff_vector_list
