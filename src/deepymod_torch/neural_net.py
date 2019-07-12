@@ -9,8 +9,25 @@ from deepymod_torch.tensorboard import custom_board
 
 def deepmod_init(network_config, library_config):
     '''
-    Builds a fully-connected NN according to specified parameters.
+    Constructs the neural network, trainable coefficient vectors and sparsity mask.
+
+    Parameters
+    ----------
+    network_config : dict
+        dict containing parameters for network construction. See DeepMoD docstring.
+    library_config : dict
+        dict containing parameters for library function. See DeepMoD docstring.
+
+    Returns
+    -------
+    torch_network: pytorch NN sequential module
+        The to-be-trained neural network.
+    coeff_vector_list: tensor list
+        list of coefficient vectors to be optimized, one for each equation.
+    sparsity_mask_list: tensor list
+        list of sparsity masks, one for each equation.
     '''
+
     # Building network
     input_dim = network_config['input_dim']
     hidden_dim = network_config['hidden_dim']
@@ -29,7 +46,7 @@ def deepmod_init(network_config, library_config):
     # Building coefficient vectors and sparsity_masks
     library_function = library_config['type']
 
-    sample_data = torch.ones(1, input_dim, requires_grad=True)  # we run a single forward pass to infer shapes
+    sample_data = torch.ones(1, input_dim, requires_grad=True)  # we run a single forward pass on fake data to infer shapes
     sample_prediction = torch_network(sample_data)
     _, theta = library_function(sample_data, sample_prediction, library_config)
     total_terms = theta.shape[1]
@@ -42,7 +59,34 @@ def deepmod_init(network_config, library_config):
 
 def train(data, target, network, coeff_vector_list, sparsity_mask_list, library_config, optim_config):
     '''
-    Trains deepmod NN.
+    Trains the deepmod neural network and its coefficient vectors until maximum amount of iterations. Writes diagnostics to
+    runs/ directory which can be analyzed with tensorboard.
+    
+    Parameters
+    ----------
+    data : Tensor of size (N x M)
+        Coordinates corresponding to target data. First column must be time.
+    target : Tensor of size (N x L)
+        Data the NN is supposed to learn.
+    network : pytorch NN sequential module
+        Network to be trained.
+    coeff_vector_list : tensor list
+        List of coefficient vectors to be optimized
+    sparsity_mask_list : tensor list
+        List of sparsity masks applied to the library function.
+    library_config : dict
+        Dict containing parameters for the library function. See DeepMoD docstring.
+    optim_config : dict
+        Dict containing parameters for training. See DeepMoD docstring.
+    
+    Returns
+    -------
+    time_deriv_list : tensor list
+        list of the time derivatives after training.
+    theta : tensor
+        library matrix after training.
+    coeff_vector_list : tensor list
+        list of the trained coefficient vectors.
     '''
 
     max_iterations = optim_config['max_iterations']
@@ -108,6 +152,6 @@ def train(data, target, network, coeff_vector_list, sparsity_mask_list, library_
             print(iteration, "%.1E" % loss.item(), "%.1E" % loss_MSE.item(), "%.1E" % loss_reg.item(), "%.1E" % loss_l1.item())
             for coeff_vector in zip(coeff_vector_list, coeff_vector_scaled_list):
                 print(coeff_vector[0])
-    
+
     writer.close()
     return time_deriv_list, theta, coeff_vector_list

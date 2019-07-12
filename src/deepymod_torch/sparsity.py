@@ -5,7 +5,7 @@ def scaling(weight_vector, library, time_deriv):
     '''
     Rescales the weight vector according to vec_rescaled = vec * |library|/|time_deriv|.
     Columns in library correspond to elements of weight_vector.
-    
+
     Parameters
     ----------
     weight_vector : tensor of size (Mx1).
@@ -14,7 +14,7 @@ def scaling(weight_vector, library, time_deriv):
         The library matrix used to rescale weight_vector.
     time_deriv : tensor of size (Nx1)
         The time derivative vector used to rescale weight_vector.
-    
+
     Returns
     -------
     tensor of size (Mx1)
@@ -29,18 +29,17 @@ def scaling(weight_vector, library, time_deriv):
 
 def threshold(scaled_coeff_vector, coeff_vector):
     '''
-    Performs thresholding of coefficient vector based on the scaled coefficient vector. 
+    Performs thresholding of coefficient vector based on the scaled coefficient vector.
     Components greater than the standard deviation of scaled coefficient vector are maintained, rest is set to zero.
     Also returns the location of the maintained components.
-    
+
     Parameters
     ----------
     scaled_coeff_vector : tensor of size (Mx1)
         scaled coefficient vector, used to determine thresholding.
     coeff_vector : tensor of size (Mx1)
         coefficient vector to be thresholded.
-        
-    
+
     Returns
     -------
     tensor of size (Nx1)
