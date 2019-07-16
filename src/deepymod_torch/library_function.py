@@ -111,3 +111,36 @@ def library_1D_in(data, prediction, library_config):
         theta = torch.cat([theta_uv, theta_dudv, theta_udu], dim=1)
 
     return time_deriv_list, theta
+
+
+
+def library_2Din_1Dout(data, prediction, library_config):
+        '''
+        Constructs a library graph in 1D. Library config is dictionary with required terms.
+        '''
+
+        # Polynomial
+        
+        max_order = library_config['poly_order']
+        u = torch.ones_like(prediction)
+
+        for order in np.arange(1, max_order+1):
+            u = torch.cat((u, u[:, order-1:order] * prediction), dim=1)
+
+        # Gradients
+        du = grad(prediction, data, grad_outputs=torch.ones_like(prediction), create_graph=True)[0]
+        u_t = du[:, 0:1]
+        u_x = du[:, 1:2]
+        u_y = du[:, 2:3]
+        du2 = grad(u_x, data, grad_outputs=torch.ones_like(prediction), create_graph=True)[0]
+        u_xx = du2[:, 1:2]
+        u_xy = du2[:, 2:3]
+        u_yy = grad(u_y, data, grad_outputs=torch.ones_like(prediction), create_graph=True)[0][:, 2:3]
+ 
+        du = torch.cat((torch.ones_like(u_x), u_x, u_y , u_xx, u_yy, u_xy), dim=1)
+
+        samples= du.shape[0]
+        # Bringing it together
+        theta = torch.matmul(u[:, :, None], du[:, None, :]).view(samples,-1)
+        
+        return [u_t], theta
