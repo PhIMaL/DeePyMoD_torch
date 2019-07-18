@@ -1,7 +1,7 @@
 #!/bin/bash
 
 container_name="deepymod_pytorch"
-image="phimal/projects:general"
+image="phimal/projects:general_v2"
 
 #First automatically find project directory
 cd ../
