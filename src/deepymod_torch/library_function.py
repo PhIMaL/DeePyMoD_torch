@@ -8,14 +8,12 @@ def library_poly(prediction, library_config):
     '''
     Calculates polynomials of function u up to order M of given input, including M=0. Each column corresponds to power, i.e.
     the columns correspond to [1, u, u^2... , u^M].
-
     Parameters
     ----------
     prediction : tensor of size (N x 1)
         dataset whose polynomials are to be calculated.
     library_config : dict
         dictionary containing options for the library function.
-
     Returns
     -------
     u : tensor of (N X (M+1))
@@ -35,7 +33,6 @@ def library_deriv(data, prediction, library_config):
     '''
     Calculates derivative of function u up to order M of given input, including M=0. Each column corresponds to power, i.e.
     the columns correspond to [1, u_x, u_xx... , u_{x^M}].
-
     Parameters
     ----------
     data : tensor of size (N x 2)
@@ -44,7 +41,6 @@ def library_deriv(data, prediction, library_config):
         dataset whose derivatives are to be calculated.
     library_config : dict
         dictionary containing options for the library function.
-
     Returns
     -------
     time_deriv: tensor of size (N x 1)
@@ -53,13 +49,17 @@ def library_deriv(data, prediction, library_config):
         Tensor containing derivatives.
     '''
     max_order = library_config['diff_order']
-
+    
     dy = grad(prediction, data, grad_outputs=torch.ones_like(prediction), create_graph=True)[0]
     time_deriv = dy[:, 0:1]
-    du = torch.cat((torch.ones_like(time_deriv), dy[:, 1:2]), dim=1)
-
-    for order in np.arange(1, max_order):
-        du = torch.cat((du, grad(du[:, order:order+1], data, grad_outputs=torch.ones_like(prediction), create_graph=True)[0][:, 1:2]), dim=1)
+    
+    if max_order == 0:
+        du = torch.ones_like(time_deriv)
+    else:
+        du = torch.cat((torch.ones_like(time_deriv), dy[:, 1:2]), dim=1)
+        if max_order >1:
+            for order in np.arange(1, max_order):
+                du = torch.cat((du, grad(du[:, order:order+1], data, grad_outputs=torch.ones_like(prediction), create_graph=True)[0][:, 1:2]), dim=1)
 
     return time_deriv, du
 
