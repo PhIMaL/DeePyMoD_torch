@@ -1,7 +1,7 @@
 #!/bin/bash
 
 container_name="deepymod_pytorch"
-image="phimal/projects:general_v2"
+image="phimal/projects:general"
 
 #First automatically find project directory
 cd ../
@@ -15,8 +15,8 @@ if [ "$(docker ps -aq -f name=$container_name)" ]; then
      if hash nvidia-docker 2>/dev/null; then
         echo 'Starting container with gpu.'
         docker run -d\
-        -p 8888:8888 -p 6006:6006 \
-        -v $projectdir:/home/working/ \
+        -p 8888:8888 -p 6006:6006 -p 8787:8787\
+        -v "$projectdir:/home/working/" \
         --ipc=host \
         --name=$container_name \
         --runtime=nvidia \
@@ -26,8 +26,8 @@ if [ "$(docker ps -aq -f name=$container_name)" ]; then
     else
          echo 'Starting container without gpu.'
          docker run -d\
-         -p 8888:8888 -p 6006:6006 \
-         -v $projectdir:/home/working/ \
+         -p 8888:8888 -p 6006:6006 -p 8787:8787 \
+         -v "$projectdir:/home/working/" \
          --ipc=host \
          --name=$container_name \
          $image bash -c "cd /home/working/ && \
