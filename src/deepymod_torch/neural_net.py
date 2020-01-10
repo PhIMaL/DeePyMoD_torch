@@ -1,6 +1,8 @@
 import numpy as np
 import torch.nn as nn
 import torch
+import sys
+import time
 
 from deepymod_torch.sparsity import scaling
 from torch.utils.tensorboard import SummaryWriter
@@ -94,13 +96,14 @@ def train(data, target, network, coeff_vector_list, sparsity_mask_list, library_
     library_function = library_config['type']
 
     optimizer = torch.optim.Adam([{'params': network.parameters(), 'lr': 0.002}, {'params': coeff_vector_list, 'lr': 0.002}])
+    start_time = time.time()
 
     # preparing tensorboard writer
     writer = SummaryWriter()
     writer.add_custom_scalars(custom_board(coeff_vector_list))
 
     # Training
-    print('Epoch | Total loss | MSE | PI | L1 ')
+    print('| Iteration | Progress | Time remaining |     Cost |      MSE |      Reg |       L1 |')
     for iteration in np.arange(max_iterations):
         # Calculating prediction and library
         prediction = network(data)
@@ -130,8 +133,9 @@ def train(data, target, network, coeff_vector_list, sparsity_mask_list, library_
         loss.backward()
         optimizer.step()
 
-        # Tensorboard stuff
+        
         if iteration % 50 == 0:
+            # Tensorboard stuff
             writer.add_scalar('Total loss', loss, iteration)
             for idx in np.arange(len(MSE_cost_list)):
                 # Costs
@@ -147,11 +151,21 @@ def train(data, target, network, coeff_vector_list, sparsity_mask_list, library_
                 for element_idx, element in enumerate(torch.unbind(coeff_vector_scaled_list[idx])):
                     writer.add_scalar('scaled_coeff ' + str(idx) + ' ' + str(element_idx), element, iteration)
 
-        # Printing
+            # Printing
+            elapsed_time = time.time() - start_time
+            progress(iteration, max_iterations, elapsed_time, loss.item(), loss_MSE.item(), loss_reg.item(), loss_l1.item())
+        '''
         if iteration % 500 == 0:
             print(iteration, "%.1E" % loss.item(), "%.1E" % loss_MSE.item(), "%.1E" % loss_reg.item(), "%.1E" % loss_l1.item())
             for coeff_vector in zip(coeff_vector_list, coeff_vector_scaled_list):
                 print(coeff_vector[0])
-
+        '''
     writer.close()
     return time_deriv_list, theta, coeff_vector_list
+
+
+def progress(iteration, max_iteration, elapsed_time, cost, MSE, PI, L1):
+    percent = iteration/max_iteration * 100
+    time_left = (elapsed_time/iteration * max_iteration) - elapsed_time if iteration != 0 else 0
+    sys.stdout.write(f"\r  {iteration:>9}   {percent:>7.2f}%   {time_left:>13.0f}s   {cost:>8.2e}   {MSE:>8.2e}   {PI:>8.2e}   {L1:>8.2e} ")
+    sys.stdout.flush()
