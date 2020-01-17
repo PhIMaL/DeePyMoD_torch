@@ -124,7 +124,6 @@ def library_new(prediction, library_config):
     return [dt], theta
 
 
-
 def library_2Din_1Dout(data, prediction, library_config):
         '''
         Constructs a library graph in 1D. Library config is dictionary with required terms.

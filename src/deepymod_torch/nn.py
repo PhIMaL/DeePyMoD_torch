@@ -56,6 +56,4 @@ class Tanh(ActivationFunction):
                                        lambda ds, x: 1 / torch.cosh(x)**2,
                                        lambda ds, x: -2 * ds[0] * ds[1],
                                        lambda ds, x: ds[2]**2 / ds[1] - 2* ds[1]**2] # ordered list of activation function and its derivatives
-        
-
-
+       
