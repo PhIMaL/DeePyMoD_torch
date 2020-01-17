@@ -49,3 +49,7 @@ MANIFEST
 .venv*/
 
 .vscode/
+
+src/deepymod_torch/.ipynb_checkpoints/
+
+tests/datasets/.ipynb_checkpoints/

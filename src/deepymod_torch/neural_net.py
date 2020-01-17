@@ -1,10 +1,12 @@
 import numpy as np
 import torch.nn as nn
+
 import torch
 import sys
 import time
 
 from deepymod_torch.sparsity import scaling
+from deepymod_torch.nn import Linear, Tanh, create_deriv_data
 from torch.utils.tensorboard import SummaryWriter
 from deepymod_torch.tensorboard import custom_board
 
@@ -36,21 +38,21 @@ def deepmod_init(network_config, library_config):
     layers = network_config['layers']
     output_dim = network_config['output_dim']
 
-    network = [nn.Linear(input_dim, hidden_dim), nn.Tanh()]  # Input layer
+    network = [Linear(input_dim, hidden_dim), Tanh()]  # Input layer
 
     for hidden_layer in np.arange(layers):  # Hidden layers
-        network.append(nn.Linear(hidden_dim, hidden_dim))
-        network.append(nn.Tanh())
+        network.append(Linear(hidden_dim, hidden_dim))
+        network.append(Tanh())
 
-    network.append(nn.Linear(hidden_dim, output_dim))  # Output layer
+    network.append(Linear(hidden_dim, output_dim))  # Output layer
     torch_network = nn.Sequential(*network)
 
     # Building coefficient vectors and sparsity_masks
     library_function = library_config['type']
 
-    sample_data = torch.ones(1, input_dim, requires_grad=True)  # we run a single forward pass on fake data to infer shapes
+    sample_data = create_deriv_data(torch.ones(1, input_dim, requires_grad=True), library_config['diff_order'])# we run a single forward pass on fake data to infer shapes
     sample_prediction = torch_network(sample_data)
-    _, theta = library_function(sample_data, sample_prediction, library_config)
+    _, theta = library_function(sample_prediction, library_config)
     total_terms = theta.shape[1]
 
     coeff_vector_list = [torch.randn((total_terms, 1), dtype=torch.float32, requires_grad=True) for _ in torch.arange(output_dim)]
@@ -107,7 +109,7 @@ def train(data, target, network, coeff_vector_list, sparsity_mask_list, library_
     for iteration in np.arange(max_iterations):
         # Calculating prediction and library
         prediction = network(data)
-        time_deriv_list, theta = library_function(data, prediction, library_config)
+        time_deriv_list, theta = library_function(prediction, library_config)
         sparse_theta_list = [theta[:, sparsity_mask] for sparsity_mask in sparsity_mask_list]
 
         # Scaling
@@ -118,7 +120,7 @@ def train(data, target, network, coeff_vector_list, sparsity_mask_list, library_
         loss_reg = torch.sum(reg_cost_list)
 
         # Calculating MSE
-        MSE_cost_list = torch.mean((prediction - target)**2, dim=0)
+        MSE_cost_list = torch.mean((prediction[0] - target)**2, dim=0)
         loss_MSE = torch.sum(MSE_cost_list)
 
         # Calculating L1

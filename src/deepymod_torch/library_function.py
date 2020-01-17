@@ -113,6 +113,17 @@ def library_1D_in(data, prediction, library_config):
     return time_deriv_list, theta
 
 
+def library_new(prediction, library_config):
+    X, dX = prediction
+    dt = dX[:, 0, 0:1, 0]
+    dx = dX[:, :, 1, 0]
+
+    u = library_poly(X, library_config)[:, :, None]
+    du = torch.cat((torch.ones((dx.shape[0], 1)), dx), dim=1)[:, None, :]
+    theta = (u @ du).reshape(u.shape[0], -1)
+    return [dt], theta
+
+
 
 def library_2Din_1Dout(data, prediction, library_config):
         '''
