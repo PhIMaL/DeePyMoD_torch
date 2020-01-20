@@ -3,6 +3,7 @@ import torch
 from torch.autograd import grad
 from itertools import combinations, product
 import torch.nn as nn
+from deepymod_torch.nn import create_deriv_data
 
 
 def library_poly(prediction, library_config):
@@ -124,13 +125,27 @@ def library_new(prediction, library_config):
     theta = (u @ du).reshape(u.shape[0], -1)
     return [dt], theta
 
+
 class Library(nn.Module):
-    def __init__(self, diff_order, poly_order):
+    def __init__(self, input_dim, output_dim, diff_order, poly_order):
         super().__init__()
         self.poly_order = poly_order
         self.diff_order = diff_order
-        
+        self.sparsity_mask_list = self.sparsity_mask_constructor(input_dim, output_dim, self.diff_order)
+
     def forward(self, input):
+        dt, theta = self.theta(input)
+        sparse_theta_list = [theta[:, sparsity_mask] for sparsity_mask in self.sparsity_mask_list]
+        return input[0], dt, sparse_theta_list
+
+    def sparsity_mask_constructor(self, input_dim, output_dim, max_order):
+        sample_data = (torch.ones((1, output_dim), dtype=torch.float32), torch.ones((1, max_order, input_dim, output_dim), dtype=torch.float32)) # we run a single forward pass on fake data to infer shapes
+        total_terms = self.theta(sample_data)[1].shape[1]
+        sparsity_mask_list = [torch.arange(total_terms) for _ in torch.arange(output_dim)]
+
+        return sparsity_mask_list
+
+    def theta(self, input):
         X, dX = input
         dt = dX[:, 0, 0:1, 0]
         dx = dX[:, :, 1, 0]
@@ -144,7 +159,8 @@ class Library(nn.Module):
         du = torch.cat((torch.ones((dx.shape[0], 1)), dx), dim=1)
 
         theta = (u[:, :, None] @ du[:, None, :]).reshape(u.shape[0], -1)
-        return X, [dt], theta
+
+        return [dt], theta
 
 def library_2Din_1Dout(data, prediction, library_config):
         '''

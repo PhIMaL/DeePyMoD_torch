@@ -11,7 +11,7 @@ def build_network(input_dim, hidden_dim, layers, output_dim, library_function, l
         network.append(Tanh())
 
     network.append(Linear(hidden_dim, output_dim))  # Output layer
-    network.append(library_function(**library_args)) # Library layer
+    network.append(library_function(input_dim, output_dim, **library_args)) # Library layer
     torch_network = nn.Sequential(*network)
 
     return torch_network
@@ -21,7 +21,7 @@ def build_coeff_vector(network, max_order):
     input_dim = next(network.parameters()).shape[1]
     sample_data = create_deriv_data(torch.ones(1, input_dim), max_order)# we run a single forward pass on fake data to infer shapes
     sample_prediction, _, theta = network(sample_data)
-    total_terms = theta.shape[1]
+    total_terms = theta[0].shape[1]
 
     coeff_vector_list = nn.ParameterList([torch.nn.Parameter(torch.rand((total_terms, 1), dtype=torch.float32)) for _ in torch.arange(sample_prediction.shape[1])])
         
