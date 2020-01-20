@@ -2,6 +2,7 @@ import numpy as np
 import torch
 from torch.autograd import grad
 from itertools import combinations, product
+import torch.nn as nn
 
 
 def library_poly(prediction, library_config):
@@ -123,6 +124,27 @@ def library_new(prediction, library_config):
     theta = (u @ du).reshape(u.shape[0], -1)
     return [dt], theta
 
+class Library(nn.Module):
+    def __init__(self, diff_order, poly_order):
+        super().__init__()
+        self.poly_order = poly_order
+        self.diff_order = diff_order
+        
+    def forward(self, input):
+        X, dX = input
+        dt = dX[:, 0, 0:1, 0]
+        dx = dX[:, :, 1, 0]
+
+        # Calculate the polynomes of u
+        u = torch.ones_like(X)
+        for order in np.arange(1, self.poly_order+1):
+            u = torch.cat((u, u[:, order-1:order] * X), dim=1)
+
+        # Calculate derivs
+        du = torch.cat((torch.ones((dx.shape[0], 1)), dx), dim=1)
+
+        theta = (u[:, :, None] @ du[:, None, :]).reshape(u.shape[0], -1)
+        return X, [dt], theta
 
 def library_2Din_1Dout(data, prediction, library_config):
         '''

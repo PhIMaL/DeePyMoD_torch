@@ -5,24 +5,21 @@ import torch.nn as nn
 import torch
 
 class deepmod_type(nn.Module):
-    def __init__(self, network_config, library_config):
+    def __init__(self, config, network_constructor=build_network):
         super().__init__()
-        self.network_config = network_config
-        self.library_config = library_config
+        self.config = config
 
-        self.network = build_network(**self.network_config)
-        self.library_function = lambda prediction: self.library_config['type'](prediction, self.library_config)
-        self.coeff_vector_list = build_coeff_vector(self.network, self.library_function, self.library_config['diff_order'])
+        self.network = network_constructor(**self.config)
+        self.coeff_vector_list = build_coeff_vector(self.network, self.config['library_args']['diff_order'])
         self.sparsity_mask_list = [torch.arange(coeff_vec.shape[0]) for coeff_vec in self.coeff_vector_list]
         
     def forward(self, input):
-        prediction = self.network(input)
-        time_deriv, theta = self.library_function(prediction)
+        prediction, time_deriv, theta = self.network(input)
         return prediction, time_deriv, theta
     
 class DeepMod():
-    def __init__(self, network_config, library_config):
-        self.network = deepmod_type(network_config, library_config)
+    def __init__(self, config):
+        self.network = deepmod_type(config)
 
     def train(self, data, target, optimizer, max_iterations, l1=10**-5, type='single_cycle'):
         if type == 'single_cycle':
@@ -50,6 +47,4 @@ class DeepMod():
     @property
     def coeff_vector_list(self):
         return self.network.coeff_vector_list
-
-
         

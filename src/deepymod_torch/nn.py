@@ -15,7 +15,6 @@ def create_deriv_data(X, max_order):
         
     return (X, dX)
 
-
 class Linear(nn.Linear):
     ''' Linear layer completely similar to Pytorch's; only takes in deriv data tuple and also outputs it.'''
     def __init__(self, in_features, out_features, bias=True):
