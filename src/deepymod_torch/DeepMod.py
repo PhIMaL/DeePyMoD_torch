@@ -1,41 +1,51 @@
-from deepymod_torch.constructors import build_network, build_coeff_vector
-from deepymod_torch.training import train
-
+import torch
 import torch.nn as nn
-from deepymod_torch.losses import DeepMoDLoss
+from deepymod_torch.training import train
+from deepymod_torch.network import Linear, Tanh
+from deepymod_torch.utilities import create_deriv_data
 
-
-class deepmod_type(nn.Module):
-    def __init__(self, config, network_constructor=build_network):
+class DeepMod(nn.Module):
+    def __init__(self, config):
         super().__init__()
-        self.config = config
+        self.network = build_network(**config)
 
-        self.network = network_constructor(**self.config)
-        self.coeff_vector_list = build_coeff_vector(self.network, self.config['library_args']['diff_order'])
+    def train(self, data, target, optimizer, max_iterations, type='single_cycle', loss_func_args={}):
+        if type == 'mse':
+           print('nope')
+        elif type == 'single_cycle':
+            train(data, target, self.network, optimizer, max_iterations, loss_func_args={'l1':1e-5})
+        elif type == 'deepmod':
+            print('nope')
+            # train
+            # scale
+            # threshold
+            # train
+            # update library func
 
     def forward(self, input):
-        prediction, time_deriv, theta = self.network(input)
-        return prediction, time_deriv, theta
+        output = self.network(input)
+        return output
 
-
-class DeepMod():
-    def __init__(self, config):
-        self.network = deepmod_type(config)
-
-    def train(self, data, target, optimizer, max_iterations, loss_func=DeepMoDLoss, loss_func_args={'l1': 10e-5}):
-        train(data, target, self.network, optimizer, max_iterations, loss_func, loss_func_args)
-
-    def __call__(self, input):
-        prediction = self.network(input)
-        return prediction
-
-    def __getattr__(self, name):
-        return self.network.__dict__[name]    
-    
-    def parameters(self):
-        return self.network.parameters()
-    
     @property
     def coeff_vector_list(self):
-        return self.network.coeff_vector_list
-        
+        return self.network[-1].coeff_vector_list
+    
+    @property
+    def sparsity_mask_list(self):
+        return self.network[-1].sparsity_mask_list
+
+
+def build_network(input_dim, hidden_dim, layers, output_dim, library_function, library_args):
+    network = [Linear(input_dim, hidden_dim), Tanh()]  # Input layer
+    for hidden_layer in torch.arange(layers):  # Hidden layers
+        network.append(Linear(hidden_dim, hidden_dim))
+        network.append(Tanh())
+    network.append(Linear(hidden_dim, output_dim))  # Output layer
+    
+    network.append(library_function(input_dim, output_dim, **library_args)) # Library layer
+    torch_network = nn.Sequential(*network)
+
+    return torch_network
+
+
+
