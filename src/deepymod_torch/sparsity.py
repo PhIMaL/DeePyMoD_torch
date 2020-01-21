@@ -1,7 +1,7 @@
 import torch
 
 
-def scaling(weight_vector, library, time_deriv):
+def scaling(coeff_vector_list, sparse_theta_list, time_deriv_list):
     '''
     Rescales the weight vector according to vec_rescaled = vec * |library|/|time_deriv|.
     Columns in library correspond to elements of weight_vector.
@@ -20,12 +20,15 @@ def scaling(weight_vector, library, time_deriv):
     tensor of size (Mx1)
         Rescaled weight vector.
     '''
+    def scaling_single_vec(coeff_vector, sparse_theta, time_deriv):
+        scaling_time = torch.norm(time_deriv, dim=0)
+        scaling_theta = torch.norm(sparse_theta, dim=0)[:, None]
+        scaled_coeff_vector = coeff_vector * (scaling_theta / scaling_time)
 
-    scaling_time = torch.norm(time_deriv, dim=0)
-    scaling_theta = torch.norm(library, dim=0)[:, None]
-    scaled_weight_vector = weight_vector * (scaling_theta / scaling_time)
-    return scaled_weight_vector
+        return scaled_coeff_vector
 
+    coeff_vector_scaled = [scaling_single_vec(coeff_vector, sparse_theta, time_deriv) for time_deriv, sparse_theta, coeff_vector in zip(time_deriv_list, sparse_theta_list, coeff_vector_list)]
+    return coeff_vector_scaled
 
 def threshold(scaled_coeff_vector, coeff_vector):
     '''

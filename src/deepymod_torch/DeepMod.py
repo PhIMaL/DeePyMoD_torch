@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from deepymod_torch.training import train
+from deepymod_torch.training import train, train_mse
 from deepymod_torch.network import Linear, Tanh
 from deepymod_torch.utilities import create_deriv_data
 
@@ -11,7 +11,7 @@ class DeepMod(nn.Module):
 
     def train(self, data, target, optimizer, max_iterations, type='single_cycle', loss_func_args={}):
         if type == 'mse':
-           print('nope')
+            train_mse(data, target, self.network, optimizer, max_iterations, loss_func_args={})
         elif type == 'single_cycle':
             train(data, target, self.network, optimizer, max_iterations, loss_func_args={'l1':1e-5})
         elif type == 'deepmod':
