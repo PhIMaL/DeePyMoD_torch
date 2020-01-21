@@ -3,7 +3,7 @@ import time
 
 from deepymod_torch.output import Tensorboard, progress
 from deepymod_torch.losses import reg_loss, mse_loss, l1_loss
-from deepymod_torch.sparsity import scaling
+from deepymod_torch.sparsity import scaling, threshold
 
 def train(data, target, model, optimizer, max_iterations, loss_func_args):
     start_time = time.time()
@@ -60,3 +60,21 @@ def train_mse(data, target, model, optimizer, max_iterations, loss_func_args):
         loss.backward()
         optimizer.step()
     board.close()
+
+def train_deepmod(data, target, model, optimizer, max_iterations, loss_func_args):
+    # Train first cycle and get prediction
+    train(data, target, model, optimizer, max_iterations, loss_func_args)
+    prediction, time_deriv_list, sparse_theta_list, coeff_vector_list = model(data)
+
+    # Threshold
+    sparse_coeff_vector_list, sparsity_mask_list = threshold(coeff_vector_list, sparse_theta_list, time_deriv_list)
+
+    # Set sparsity mask and coeff vector
+    model[-1].sparsity_mask_list = sparsity_mask_list
+    model[-1].coeff_vector_list = torch.nn.ParameterList(sparse_coeff_vector_list)
+    
+    #Train without l1, reseeting optimizer for different shapes
+    optimizer.param_groups[0]['params'] = model.parameters()
+    print() #empty line for correct printing
+    train(data, target, model, optimizer, max_iterations, dict(loss_func_args, **{'l1':0.0}))
+
