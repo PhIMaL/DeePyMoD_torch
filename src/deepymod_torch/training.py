@@ -17,13 +17,13 @@ def train(data, target, model, optimizer, max_iterations, loss_func_args):
         # Calculating prediction and library and scaling
         prediction, time_deriv_list, sparse_theta_list, coeff_vector_list = model(data)
         coeff_vector_scaled_list = scaling(coeff_vector_list, sparse_theta_list, time_deriv_list) 
-
+        
         # Calculating loss
         loss_reg = reg_loss(time_deriv_list, sparse_theta_list, coeff_vector_list)
         loss_mse = mse_loss(prediction[0], target)
         loss_l1 = l1_loss(coeff_vector_scaled_list, loss_func_args['l1'])
         loss = torch.sum(loss_reg) + torch.sum(loss_mse) + torch.sum(loss_l1)
-
+        
         # Writing
         if iteration % 100 == 0:
             progress(iteration, start_time, max_iterations, loss.item(), torch.sum(loss_mse).item(), torch.sum(loss_reg).item(), torch.sum(loss_l1).item())
