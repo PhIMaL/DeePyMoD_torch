@@ -1,4 +1,4 @@
-# Diffusion, tests 2D input, D = 0.5
+# Keller Segel, tests coupled output.
 
 # General imports
 import numpy as np
@@ -20,23 +20,23 @@ torch.backends.cudnn.deterministic = True
 torch.backends.cudnn.benchmark = False
 
 # Loading data
-data = np.load('data/diffusion_2D.npy', allow_pickle=True).item()
-X = np.transpose((data['t'].flatten(), data['x'].flatten(), data['y'].flatten()))
-y = np.real(data['u']).reshape((data['u'].size, 1))
-number_of_samples = 1000
+data = np.load('data/keller_segel.npy', allow_pickle=True).item()
+X = np.transpose((data['t'].flatten(), data['x'].flatten()))
+y = np.transpose((data['u'].flatten(), data['v'].flatten()))
+number_of_samples = 2000
 
-idx = np.random.permutation(y.size)
-X_train = torch.tensor(X[idx, :][:number_of_samples], dtype=torch.float32, requires_grad=True)
+idx = np.random.permutation(y.shape[0])
+X_train = torch.tensor(X[idx, :][:number_of_samples], dtype=torch.float32)
 y_train = torch.tensor(y[idx, :][:number_of_samples], dtype=torch.float32)
 
 ## Running DeepMoD
-config = {'input_dim': 3, 'hidden_dim': 20, 'layers': 5, 'output_dim': 1, 'library_function': library_basic, 'library_args':{'poly_order': 1, 'diff_order': 2}}
+config = {'input_dim': 2, 'hidden_dim': 20, 'layers': 5, 'output_dim': 2, 'library_function': library_basic, 'library_args':{'poly_order': 2, 'diff_order': 2}}
 
 X_input = create_deriv_data(X_train, config['library_args']['diff_order'])
 
 model = DeepMod(config)
 optimizer = torch.optim.Adam(model.parameters(), lr=0.002)
-model.train(X_input, y_train, optimizer, 5000, type='deepmod')
+model.train(X_input, y_train, optimizer, 10000, type='deepmod')
 
 print()
 print(model.sparsity_mask_list) 
