@@ -5,19 +5,7 @@ from deepymod_torch.network import Linear, Tanh
 from deepymod_torch.utilities import create_deriv_data
 
 class DeepMod(nn.Module):
-    '''
-    Class based interface to Deepmod model. Just encapsulates different training regimes.
-
-    Parameters
-    ----------
-    config : dict
-        dict containing configuration for DeepMod model. See example for dict keywords.
-
-    Returns
-    -------
-    DeepMoD : class instance
-        class instance of DeepMod type.
-    '''
+    ''' Class based interface for deepmod.'''
     def __init__(self, config):
         super().__init__()
         self.network = build_network(**config)
@@ -45,25 +33,7 @@ class DeepMod(nn.Module):
 
 
 def build_network(input_dim, hidden_dim, layers, output_dim, library_function, library_args):
-    '''
-    Constructs the DeepMoD model. 
-
-    Parameters
-    ----------
-    input_dim : int
-        Number of neurons in input layer of NN.
-    hidden_dim : int
-        Number of neurons in hidden layers of NN.
-    layers : int
-        Number of hidden layers in NN.
-    output_dim : int
-        Number of neurons in output of NN.
-
-    Returns
-    -------
-    torch_network : class instance
-        class instance of pytorch network.
-    '''
+    ''' Build deepmod model.'''
     network = [Linear(input_dim, hidden_dim), Tanh()]  # Input layer
     for hidden_layer in torch.arange(layers):  # Hidden layers
         network.append(Linear(hidden_dim, hidden_dim))

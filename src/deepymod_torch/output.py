@@ -4,17 +4,7 @@ import torch
 from torch.utils.tensorboard import SummaryWriter
 
 class Tensorboard():
-    '''
-    Implements a simple tensorboard class for logging during deepmod training. 
-
-    Parameters
-    ----------
-    number_of_terms : list
-        list of containing number of terms in each eq.
-
-    Returns
-    -------
-    '''
+    '''Tensorboard class for logging during deepmod training. '''
     def __init__(self, number_of_terms):
         self.writer = SummaryWriter()
         self.writer.add_custom_scalars(custom_board(number_of_terms))
@@ -35,19 +25,7 @@ class Tensorboard():
         self.writer.close()
 
 def custom_board(number_of_terms):
-    '''
-    Constructs a dict containing the layout for a custom scalar board for tensorboard.
-
-    Parameters
-    ----------
-    number_of_terms : list
-        list of containing number of terms in each eq.
-
-    Returns
-    -------
-    custom_board : dict
-        dict containing layout of custom board.
-    '''
+    '''Custom scalar board for tensorboard.'''
     number_of_eqs = len(number_of_terms)
     # Initial setup, including all the costs and losses
     custom_board = {'Costs': {'MSE': ['Multiline', ['MSE_' + str(idx) for idx in np.arange(number_of_eqs)]],
@@ -64,29 +42,7 @@ def custom_board(number_of_terms):
     return custom_board
 
 def progress(iteration, start_time, max_iteration, cost, MSE, PI, L1):
-    '''
-    Prints and updates progress of training cycle in command line.
-
-    Parameters
-    ----------
-    iteration : int
-        Current iteration.
-    start_time : int
-        Time training started; used for estimating remaining time.
-    max_iteration : int
-        Maximum number of iterations.
-    cost: float
-        Current total cost.
-    MSE: float
-        Current MSE loss.
-    PI: float
-        Current Reg/PI loss.
-    L1: float
-        Current L1 loss.
-
-    Returns
-    -------
-    '''
+    '''Prints and updates progress of training cycle in command line.'''
     percent = iteration.item()/max_iteration * 100
     elapsed_time = time.time() - start_time
     time_left = elapsed_time * (max_iteration/iteration - 1) if iteration != 0 else 0
