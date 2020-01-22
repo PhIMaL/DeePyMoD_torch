@@ -9,9 +9,10 @@ class library_1D(Library):
         super().__init__(input_dim, output_dim, diff_order)
 
     def theta(self, input):
+        # Works for all N-D inputs, 1-D outputs
         X, dX = input
         dt = dX[:, 0, 0:1, 0]
-        dx = dX[:, :, 1, 0]
+        dx = dX[:, :, 1:, 0]
 
         # Calculate the polynomes of u
         u = torch.ones_like(X)
@@ -19,7 +20,7 @@ class library_1D(Library):
             u = torch.cat((u, u[:, order-1:order] * X), dim=1)
 
         # Calculate derivs
-        du = torch.cat((torch.ones((dx.shape[0], 1)), dx), dim=1)
+        du = torch.cat((torch.ones((dx.shape[0], 1)), dx.reshape(dx.shape[0], -1)), dim=1) # u_x, u_y, u_xx, u_yy etc
 
         theta = (u[:, :, None] @ du[:, None, :]).reshape(u.shape[0], -1)
 

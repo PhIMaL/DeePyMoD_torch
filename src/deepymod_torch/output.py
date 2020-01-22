@@ -4,17 +4,29 @@ import torch
 from torch.utils.tensorboard import SummaryWriter
 
 class Tensorboard():
+    '''
+    Implements a simple tensorboard class for logging during deepmod training. 
+
+    Parameters
+    ----------
+    number_of_terms : list
+        list of containing number of terms in each eq.
+
+    Returns
+    -------
+    '''
     def __init__(self, number_of_terms):
         self.writer = SummaryWriter()
         self.writer.add_custom_scalars(custom_board(number_of_terms))
 
     def write(self, iteration, loss, loss_mse, loss_reg, loss_l1, coeff_vector_list, coeff_vector_scaled_list):
+        # Logs losses, costs and coeff vectors.
         self.writer.add_scalar('Total loss', loss, iteration)
         for idx in range(len(loss_mse)):
             self.writer.add_scalar('MSE '+str(idx), loss_mse[idx], iteration)
             self.writer.add_scalar('Regression '+str(idx), loss_reg[idx], iteration)
             self.writer.add_scalar('L1 '+str(idx), loss_l1[idx], iteration)
-            for element_idx, element in enumerate(torch.unbind(coeff_vector_list[idx])):
+            for element_idx, element in enumerate(torch.unbind(coeff_vector_list[idx])): # Tensorboard doesnt have vectors, so we unbind and plot them in together in custom board
                 self.writer.add_scalar('coeff ' + str(idx) + ' ' + str(element_idx), element, iteration)
             for element_idx, element in enumerate(torch.unbind(coeff_vector_scaled_list[idx])):
                 self.writer.add_scalar('scaled_coeff ' + str(idx) + ' ' + str(element_idx), element, iteration)
@@ -24,13 +36,12 @@ class Tensorboard():
 
 def custom_board(number_of_terms):
     '''
-    Constructs a dict containing the layout for a custom scalar board for tensorboard. Shapes and amount of plots are inferred from the
-    coefficient vector list.
+    Constructs a dict containing the layout for a custom scalar board for tensorboard.
 
     Parameters
     ----------
-    coeff_vector_list : tensor list
-        list of coefficient vectors.
+    number_of_terms : list
+        list of containing number of terms in each eq.
 
     Returns
     -------
@@ -53,6 +64,29 @@ def custom_board(number_of_terms):
     return custom_board
 
 def progress(iteration, start_time, max_iteration, cost, MSE, PI, L1):
+    '''
+    Prints and updates progress of training cycle in command line.
+
+    Parameters
+    ----------
+    iteration : int
+        Current iteration.
+    start_time : int
+        Time training started; used for estimating remaining time.
+    max_iteration : int
+        Maximum number of iterations.
+    cost: float
+        Current total cost.
+    MSE: float
+        Current MSE loss.
+    PI: float
+        Current Reg/PI loss.
+    L1: float
+        Current L1 loss.
+
+    Returns
+    -------
+    '''
     percent = iteration.item()/max_iteration * 100
     elapsed_time = time.time() - start_time
     time_left = elapsed_time * (max_iteration/iteration - 1) if iteration != 0 else 0

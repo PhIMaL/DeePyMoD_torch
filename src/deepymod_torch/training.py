@@ -6,6 +6,27 @@ from deepymod_torch.losses import reg_loss, mse_loss, l1_loss
 from deepymod_torch.sparsity import scaling, threshold
 
 def train(data, target, model, optimizer, max_iterations, loss_func_args):
+    '''
+    Trains the deepmod model with MSE, regression and l1 cost function. Updates model in-place.
+
+    Parameters
+    ----------
+    data : Tensor
+        Coordinates of problem. Temporal coordinates must be first column.
+    target : Tensor
+        Measurements.
+    model : DeepMoD model
+        Model to be optimized.
+    optimizer : Pytorch Optimizer
+        Optimizer which updates the network
+    max_iterations : int
+        Maximum number of iterations.
+    loss_func_args : dict
+        Extra arguments for loss function (e.g. l1 scale).
+
+    Returns
+    -------
+    '''
     start_time = time.time()
     number_of_terms = [coeff_vec.shape[0] for coeff_vec in model[-1].coeff_vector_list]
     board = Tensorboard(number_of_terms)
@@ -35,6 +56,27 @@ def train(data, target, model, optimizer, max_iterations, loss_func_args):
     board.close()
 
 def train_mse(data, target, model, optimizer, max_iterations, loss_func_args):
+    '''
+    Trains the deepmod model only on the MSE. Updates model in-place.
+
+    Parameters
+    ----------
+    data : Tensor
+        Coordinates of problem. Temporal coordinates must be first column.
+    target : Tensor
+        Measurements.
+    model : DeepMoD model
+        Model to be optimized.
+    optimizer : Pytorch Optimizer
+        Optimizer which updates the network
+    max_iterations : int
+        Maximum number of iterations.
+    loss_func_args : dict
+        Extra arguments for loss function (e.g. l1 scale).
+
+    Returns
+    -------
+    '''
     start_time = time.time()
     number_of_terms = [coeff_vec.shape[0] for coeff_vec in model[-1].coeff_vector_list]
     board = Tensorboard(number_of_terms)
@@ -62,18 +104,37 @@ def train_mse(data, target, model, optimizer, max_iterations, loss_func_args):
     board.close()
 
 def train_deepmod(data, target, model, optimizer, max_iterations, loss_func_args):
+    '''
+    Performs full deepmod cycle: trains model, thresholds and trains again for unbiased estimate. Updates model in-place.
+
+    Parameters
+    ----------
+    data : Tensor
+        Coordinates of problem. Temporal coordinates must be first column.
+    target : Tensor
+        Measurements.
+    model : DeepMoD model
+        Model to be optimized.
+    optimizer : Pytorch Optimizer
+        Optimizer which updates the network
+    max_iterations : int
+        Maximum number of iterations.
+    loss_func_args : dict
+        Extra arguments for loss function (e.g. l1 scale).
+
+    Returns
+    -------
+    '''
     # Train first cycle and get prediction
     train(data, target, model, optimizer, max_iterations, loss_func_args)
     prediction, time_deriv_list, sparse_theta_list, coeff_vector_list = model(data)
 
-    # Threshold
+    # Threshold, set sparsity mask and coeff vector
     sparse_coeff_vector_list, sparsity_mask_list = threshold(coeff_vector_list, sparse_theta_list, time_deriv_list)
-
-    # Set sparsity mask and coeff vector
     model[-1].sparsity_mask_list = sparsity_mask_list
     model[-1].coeff_vector_list = torch.nn.ParameterList(sparse_coeff_vector_list)
     
-    #Train without l1, reseeting optimizer for different shapes
+    #Resetting optimizer for different shapes, train without l1 
     optimizer.param_groups[0]['params'] = model.parameters()
     print() #empty line for correct printing
     train(data, target, model, optimizer, max_iterations, dict(loss_func_args, **{'l1':0.0}))

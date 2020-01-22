@@ -1,6 +1,24 @@
 import torch
 
 def scaling_single_vec(coeff_vector, sparse_theta, time_deriv):
+    '''
+    Rescales the weight vector according to vec_rescaled = vec * |library|/|time_deriv|.
+    Columns in library correspond to elements of weight_vector.
+
+    Parameters
+    ----------
+    coeff_vector : tensor
+        The weight vector to be rescaled.
+    sparse_theta : tensor
+        The library matrix used to rescale weight_vector.
+    time_deriv : tensor
+        The time derivative vector used to rescale weight_vector.
+
+    Returns
+    -------
+    coeff_vector_scaled : tensor
+        Rescaled coefficient vector.
+    '''
     scaling_time = torch.norm(time_deriv, dim=0)
     scaling_theta = torch.norm(sparse_theta, dim=0)[:, None]
     coeff_vector_scaled = coeff_vector * (scaling_theta / scaling_time)
@@ -9,34 +27,69 @@ def scaling_single_vec(coeff_vector, sparse_theta, time_deriv):
 
 def scaling(coeff_vector_list, sparse_theta_list, time_deriv_list):
     '''
-    Rescales the weight vector according to vec_rescaled = vec * |library|/|time_deriv|.
-    Columns in library correspond to elements of weight_vector.
+    Wrapper around scaling_single_vec to scale multiple eqs. See scaling_single_vec for more details.
 
     Parameters
     ----------
-    weight_vector : tensor of size (Mx1).
-        The weight vector to be rescaled.
-    library : tensor of size (NxM)
-        The library matrix used to rescale weight_vector.
-    time_deriv : tensor of size (Nx1)
-        The time derivative vector used to rescale weight_vector.
+    coeff_vector_list : TensorList
+        List tensors containing the coefficient vector for each eq.
+    sparse_theta_list : TensorList
+        List tensors containing the library for each eq.
+    time_deriv_list : TensorList
+        List tensors containing time deriv for each eq.
 
     Returns
     -------
-    tensor of size (Mx1)
-        Rescaled weight vector.
+    coeff_vector_scaled_list : Tensorlist
+        List of rescaled coefficient vectors.
     '''
     coeff_vector_scaled_list = [scaling_single_vec(coeff_vector, sparse_theta, time_deriv) for time_deriv, sparse_theta, coeff_vector in zip(time_deriv_list, sparse_theta_list, coeff_vector_list)]
     return coeff_vector_scaled_list
 
 def threshold_single(coeff_vector_scaled, coeff_vector):
+    '''
+    Removes coefficient if |value| < std(coefficient_vec) and returns new coefficient vector and sparsity mask.
+
+    Parameters
+    ----------
+    coeff_vector_scaled : tensor
+        Normalized coefficient vector.
+    coeff_vector : tensor
+        Unnormalized coefficient vector.
+
+    Returns
+    -------
+    sparse_coeff_vector : tensor
+        Non-zero components of coeff_vector
+    sparsity_mask : tensor
+        Index corresponding to non-zero components. Used to create the sparse theta.
+    '''
     sparse_coeff_vector = torch.where(torch.abs(coeff_vector_scaled) > torch.std(coeff_vector_scaled, dim=0), coeff_vector, torch.zeros_like(coeff_vector_scaled))
     sparsity_mask = torch.nonzero(sparse_coeff_vector)[:, 0].detach()  # detach it so it doesn't get optimized and throws an error
-    sparse_coeff_vector = torch.nn.Parameter(sparse_coeff_vector[sparsity_mask].clone().detach())  # so it can be optimized
+    sparse_coeff_vector = torch.nn.Parameter(sparse_coeff_vector[sparsity_mask].clone().detach())
 
     return sparse_coeff_vector, sparsity_mask
     
 def threshold(coeff_vector_list, sparse_theta_list, time_deriv_list):
+    '''
+    Wrapper around threshold_single to threshold list of vectors. Also performs scaling, whereas single doesnt.
+
+    Parameters
+    ----------
+    coeff_vector_list : TensorList
+        List tensors containing the coefficient vector for each eq.
+    sparse_theta_list : TensorList
+        List tensors containing the library for each eq.
+    time_deriv_list : TensorList
+        List tensors containing time deriv for each eq.
+
+    Returns
+    -------
+    sparse_coeff_vector_list : TensorList
+        List of sparse coefficient vector of each eq.
+    sparsity_mask_list : TensorList
+        List of sparsity masks corresponding to non-zero indexes of coefficient vectors.
+    '''
     coeff_vector_scaled_list = scaling(coeff_vector_list, sparse_theta_list, time_deriv_list)
     result = [threshold_single(coeff_vector_scaled, coeff_vector) for coeff_vector_scaled, coeff_vector in zip(coeff_vector_scaled_list, coeff_vector_list)]
     sparse_coeff_vector_list, sparsity_mask_list = map(list, zip(*result))

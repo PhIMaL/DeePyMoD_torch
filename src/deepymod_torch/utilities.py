@@ -16,7 +16,24 @@ def terms_definition(poly_list, deriv_list):
     return theta
 
 def create_deriv_data(X, max_order):
-    ''' Utility function to create the deriv object'''
+    '''
+    Automatically creates data-deriv tuple to feed to derivative network. 
+    Shape before network is (sample x order x input).
+    Shape after network will be (sample x order x input x output).
+
+    Parameters
+    ----------
+    X : Tensor
+        Normal dataset tensor (i.e. samples x features tensor)
+    max_order : int
+        Higher order derivative to be calculated
+
+    Returns
+    -------
+    (X, dX) : Tensor tuple
+        Tuple containing input data and derivative tensor.
+    '''
+    
     if max_order == 1:
         dX = (torch.eye(X.shape[1]) * torch.ones(X.shape[0])[:, None, None])[:, None, :]
     else: 
