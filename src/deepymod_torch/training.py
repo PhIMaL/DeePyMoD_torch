@@ -73,7 +73,9 @@ def train_deepmod(data, target, model, optimizer, max_iterations, loss_func_args
     sparse_coeff_vector_list, sparsity_mask_list = threshold(coeff_vector_list, sparse_theta_list, time_deriv_list)
     model[-1].sparsity_mask_list = sparsity_mask_list
     model[-1].coeff_vector_list = torch.nn.ParameterList(sparse_coeff_vector_list)
-    
+    print()
+    print(sparse_coeff_vector_list)
+    print(sparsity_mask_list)
     #Resetting optimizer for different shapes, train without l1 
     optimizer.param_groups[0]['params'] = model.parameters()
     print() #empty line for correct printing
