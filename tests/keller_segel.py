@@ -23,20 +23,20 @@ torch.backends.cudnn.benchmark = False
 data = np.load('data/keller_segel.npy', allow_pickle=True).item()
 X = np.transpose((data['t'].flatten(), data['x'].flatten()))
 y = np.transpose((data['u'].flatten(), data['v'].flatten()))
-number_of_samples = 2000
+number_of_samples = 5000
 
 idx = np.random.permutation(y.shape[0])
 X_train = torch.tensor(X[idx, :][:number_of_samples], dtype=torch.float32)
 y_train = torch.tensor(y[idx, :][:number_of_samples], dtype=torch.float32)
 
 ## Running DeepMoD
-config = {'input_dim': 2, 'hidden_dim': 20, 'layers': 5, 'output_dim': 2, 'library_function': library_basic, 'library_args':{'poly_order': 2, 'diff_order': 2}}
+config = {'input_dim': 2, 'hidden_dim': 20, 'layers': 5, 'output_dim': 2, 'library_function': library_basic, 'library_args':{'poly_order': 1, 'diff_order': 2}}
 
 X_input = create_deriv_data(X_train, config['library_args']['diff_order'])
 
 model = DeepMod(config)
-optimizer = torch.optim.Adam(model.parameters(), lr=0.002)
-model.train(X_input, y_train, optimizer, 10000, type='deepmod')
+optimizer = torch.optim.Adam(model.parameters())
+model.train(X_input, y_train, optimizer, 100000, type='deepmod')
 
 print()
 print(model.sparsity_mask_list) 
