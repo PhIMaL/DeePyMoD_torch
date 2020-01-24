@@ -33,8 +33,6 @@ y_train = torch.tensor(y[idx, :][:number_of_samples], dtype=torch.float32)
 config = {'input_dim': 2, 'hidden_dim': 20, 'layers': 5, 'output_dim': 2, 'library_function': library_basic, 'library_args':{'poly_order': 1, 'diff_order': 2}}
 
 X_input = create_deriv_data(X_train, config['library_args']['diff_order'])
-
-model = DeepMod(config)
 optimizer = torch.optim.Adam(model.parameters())
 model.train(X_input, y_train, optimizer, 100000, type='deepmod')
 
