@@ -10,7 +10,7 @@ class library_basic(Library):
         super().__init__(input_dim, output_dim, diff_order)
     
     def theta(self, input):
-        '''Calculates the library and time deriv from NN output'''
+        '''Calculates the library and time deriv from NN output. See https://github.com/PhIMaL/network_derivs for additional info on how derivs are calculated.'''
         X, dX = input # The network now returns the (output, deriv) tuple. dX is 4-dimensional tensor of derivatives with each axis the following meaning: (sample, order, input, output)
         samples = X.shape[0]
 
