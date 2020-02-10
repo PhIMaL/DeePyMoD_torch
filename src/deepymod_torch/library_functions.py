@@ -11,11 +11,11 @@ class library_basic(Library):
     
     def theta(self, input):
         '''Calculates the library and time deriv from NN output'''
-        X, dX = input
+        X, dX = input # The network now returns the (output, deriv) tuple. dX is 4-dimensional tensor of derivatives with each axis the following meaning: (sample, order, input, output)
         samples = X.shape[0]
 
         # Time derivatives
-        dt = dX[:, 0, :1, :]
+        dt = dX[:, 0, :1, :] # time is first input and we only need first order so dX[:, 0, :1, :]
         time_deriv_list = torch.unbind(dt, dim=2)
 
         # Polynomial part
@@ -25,7 +25,7 @@ class library_basic(Library):
         poly_list = torch.unbind(u, dim=2) #list with each entry corresponding to eq.
 
         # Derivative part
-        dx = dX[:, :, 1:, :]
+        dx = dX[:, :, 1:, :].  # spatial are all inputs after 1 so dX[:, :, 1:, :]
         deriv_list = [torch.cat((torch.ones((samples, 1)), eq.reshape(samples, -1)), dim=1) for eq in torch.unbind(dx, dim=3)] #list with each entry corresponding to eq.
         
         # Combining to make  theta
