@@ -25,7 +25,7 @@ class library_basic(Library):
         poly_list = torch.unbind(u, dim=2) #list with each entry corresponding to eq.
 
         # Derivative part
-        dx = dX[:, :, 1:, :].  # spatial are all inputs after 1 so dX[:, :, 1:, :]
+        dx = dX[:, :, 1:, :]  # spatial are all inputs after 1 so dX[:, :, 1:, :]
         deriv_list = [torch.cat((torch.ones((samples, 1)), eq.reshape(samples, -1)), dim=1) for eq in torch.unbind(dx, dim=3)] #list with each entry corresponding to eq.
         
         # Combining to make  theta
