@@ -10,13 +10,13 @@ class DeepMod(nn.Module):
         super().__init__()
         self.network = build_network(**config)
 
-    def train(self, data, target, optimizer, max_iterations, type='single_cycle', loss_func_args={}):
+    def train(self, data, target, optimizer, max_iterations, type='single_cycle', loss_func_args={'l1':10**-5}):
         if type == 'mse':
             train_mse(data, target, self.network, optimizer, max_iterations, loss_func_args={}) # Trains only mse.
         elif type == 'single_cycle':
-            train(data, target, self.network, optimizer, max_iterations, loss_func_args={'l1':1e-5}) #DeepMod style training, but doesn't threshold.
+            train(data, target, self.network, optimizer, max_iterations, loss_func_args) #DeepMod style training, but doesn't threshold.
         elif type == 'deepmod':
-            train_deepmod(data, target, self.network, optimizer, max_iterations, loss_func_args={'l1':1e-5}) # Does full deepmod cycle.
+            train_deepmod(data, target, self.network, optimizer, max_iterations, loss_func_args) # Does full deepmod cycle.
 
     def forward(self, input):
         output = self.network(input)
