@@ -8,7 +8,7 @@ from deepymod_torch.sparsity import scaling, threshold
 def train(data, target, model, optimizer, max_iterations, loss_func_args):
     '''Trains the deepmod model with MSE, regression and l1 cost function. Updates model in-place.'''
     start_time = time.time()
-    number_of_terms = [coeff_vec.shape[0] for coeff_vec in model[-1].coeff_vector_list]
+    number_of_terms = [coeff_vec.shape[0] for coeff_vec in model[-1].coeff_vector]
     board = Tensorboard(number_of_terms)
 
     # Training
