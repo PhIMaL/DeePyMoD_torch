@@ -7,6 +7,7 @@ import torch
 # DeepMoD stuff
 from deepymod_torch.DeepMod import DeepMod
 from deepymod_torch.library_functions import library_1D_in
+from deepymod_torch.training import train_deepmod, train_mse
 
 # Setting cuda
 if torch.cuda.is_available():
@@ -32,9 +33,9 @@ y_train = torch.tensor(y[idx, :][:number_of_samples], dtype=torch.float32, requi
 config = {'input_dim': 2, 'hidden_dims': [20, 20, 20, 20, 20, 20], 'output_dim': 1, 'library_function': library_1D_in, 'library_args':{'poly_order': 2, 'diff_order': 2}}
 
 model = DeepMod(config)
-optimizer = torch.optim.Adam(model.parameters(), lr=0.002)
-model.train(X_train, y_train, optimizer, 5000, type='deepmod')
+optimizer = torch.optim.Adam([{'params': model.network.parameters(), 'lr':0.002}, {'params': model.fit.parameters(), 'lr':0.002}])
+train_deepmod(model, X_train, y_train, optimizer, 1000, {'l1': 1e-5})
 
 print()
-print(model.sparsity_mask_list) 
-print(model.coeff_vector_list)
+print(model.fit.sparsity_mask) 
+print(model.fit.coeff_vector)
