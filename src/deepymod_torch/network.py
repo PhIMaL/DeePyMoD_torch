@@ -49,23 +49,24 @@ class Tanh(ActivationFunction):
 
 class Library(nn.Module):
     '''Abstract baseclass for library-as-layer. Child requires theta function (see library_functions). '''
-    def __init__(self, input_dim, output_dim, diff_order):
+    def __init__(self, n_in, n_out, library_func, library_args={}):
         super().__init__()
-        self.diff_order = diff_order
-        self.total_terms = self.terms(input_dim, output_dim, self.diff_order)
-
+        self.library_func = library_func
+        self.library_args = library_args
+        self.n_terms = self.terms(n_in, n_out)
+        
     def forward(self, input):
         '''Calculates output.'''
-        time_deriv_list, theta = self.theta(input)
+        time_deriv_list, theta = self.library_func(input, **self.library_args)
         return (input, time_deriv_list, theta)
 
-    def terms(self, input_dim, output_dim, max_order):
+    def terms(self, n_in, n_out):
         '''Calculates the number of terms the library produces'''
-        sample_data = (torch.ones((1, output_dim), dtype=torch.float32), torch.ones((1, max_order, input_dim, output_dim), dtype=torch.float32)) # we run a single forward pass on fake data to infer shapes
-        total_terms = self.theta(sample_data)[1].shape[1]
+        max_order = self.library_args['diff_order']
+        sample_data = (torch.ones((1, n_out), dtype=torch.float32), torch.ones((1, max_order, n_in, n_out), dtype=torch.float32)) # we run a single forward pass on fake data to infer shapes
+        total_terms = self.forward(sample_data)[2].shape[1]
 
         return total_terms
-
 
 class Fitting(nn.Module):
     def __init__(self, n_terms, n_out):

@@ -6,7 +6,7 @@ import torch
 
 # DeepMoD stuff
 from deepymod_torch.DeepMod import DeepMod
-from deepymod_torch.library_functions import library_basic
+from deepymod_torch.library_functions import basic_library_function
 from deepymod_torch.utilities import create_deriv_data
 
 # Setting cuda
@@ -30,7 +30,7 @@ X_train = torch.tensor(X[idx, :][:number_of_samples], dtype=torch.float32)
 y_train = torch.tensor(y[idx, :][:number_of_samples], dtype=torch.float32)
 
 ## Running DeepMoD
-config = {'input_dim': 2, 'hidden_dim': 20, 'layers': 5, 'output_dim': 1, 'library_function': library_basic, 'library_args':{'poly_order': 2, 'diff_order': 2}}
+config = {'input_dim': 2, 'hidden_dim': 20, 'layers': 5, 'output_dim': 1, 'library_function': basic_library_function, 'library_args':{'poly_order': 2, 'diff_order': 2}}
 
 X_input = create_deriv_data(X_train, config['library_args']['diff_order'])
 
