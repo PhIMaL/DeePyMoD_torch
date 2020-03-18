@@ -29,7 +29,7 @@ X_train = torch.tensor(X[idx, :][:number_of_samples], dtype=torch.float32, requi
 y_train = torch.tensor(y[idx, :][:number_of_samples], dtype=torch.float32, requires_grad=True)
 
 ## Running DeepMoD
-config = {'input_dim': 2, 'hidden_dim': 20, 'layers': 5, 'output_dim': 1, 'library_function': library_1D_in, 'library_args':{'poly_order': 2, 'diff_order': 2}}
+config = {'input_dim': 2, 'hidden_dims': [20, 20, 20, 20, 20, 20], 'output_dim': 1, 'library_function': library_1D_in, 'library_args':{'poly_order': 2, 'diff_order': 2}}
 
 model = DeepMod(config)
 optimizer = torch.optim.Adam(model.parameters(), lr=0.002)

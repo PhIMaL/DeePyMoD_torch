@@ -32,13 +32,16 @@ class DeepMod(nn.Module):
         return self.network[-1].sparsity_mask_list
 
 
-def build_network(input_dim, hidden_dim, layers, output_dim, library_function, library_args):
+def build_network(input_dim, hidden_dims, output_dim, library_function, library_args):
     ''' Build deepmod model.'''
-    network = [Linear(input_dim, hidden_dim), Tanh()]  # Input layer
-    for hidden_layer in torch.arange(layers):  # Hidden layers
-        network.append(Linear(hidden_dim, hidden_dim))
+    network = []
+    hs = [input_dim] + hidden_dims + [output_dim]
+    for h0, h1 in zip(hs, hs[1:]):  # Hidden layers
+        network.append(Linear(h0, h1))
         network.append(Tanh())
-    network.append(Linear(hidden_dim, output_dim))  # Output layer
+    network.pop()
+    print(network)
+
     network.append(Library(library_function, library_args)) # Library layer
 
     # Do a fake forward pass to infer number of terms from library
