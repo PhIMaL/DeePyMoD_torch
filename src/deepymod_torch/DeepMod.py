@@ -1,8 +1,8 @@
 import torch
 import torch.nn as nn
 from deepymod_torch.training import train, train_mse, train_deepmod
-from deepymod_torch.network import Linear, Tanh, Fitting, Library
-from deepymod_torch.utilities import create_deriv_data
+from deepymod_torch.network import Fitting, Library, Linear, Tanh
+
 
 class DeepMod(nn.Module):
     ''' Class based interface for deepmod.'''
@@ -39,11 +39,14 @@ def build_network(input_dim, hidden_dim, layers, output_dim, library_function, l
         network.append(Linear(hidden_dim, hidden_dim))
         network.append(Tanh())
     network.append(Linear(hidden_dim, output_dim))  # Output layer
-    
-    network.append(Library(input_dim, output_dim, library_function, library_args)) # Library layer
-    n_terms = network[-1].n_terms
-    network.append(Fitting(n_terms, output_dim))
+    network.append(Library(library_function, library_args)) # Library layer
 
+    # Do a fake forward pass to infer number of terms from library
+    input = torch.ones((1, input_dim), dtype=torch.float32, requires_grad=True)
+    for layer in network:
+        input = layer(input)
+    n_terms = input[2].shape[1]
+    network.append(Fitting(n_terms, output_dim))
     torch_network = nn.Sequential(*network)
 
     return torch_network
