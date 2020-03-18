@@ -4,9 +4,7 @@ from torch.autograd import grad
 from itertools import combinations, product
 
 
-def library_poly(prediction, library_config):
-    max_order = library_config['poly_order']
-
+def library_poly(prediction, max_order):
     # Calculate the polynomes of u
     u = torch.ones_like(prediction)
     for order in np.arange(1, max_order+1):
@@ -15,27 +13,7 @@ def library_poly(prediction, library_config):
     return u
 
 
-def library_deriv(data, prediction, library_config):
-    '''
-    Calculates derivative of function u up to order M of given input, including M=0. Each column corresponds to power, i.e.
-    the columns correspond to [1, u_x, u_xx... , u_{x^M}].
-    Parameters
-    ----------
-    data : tensor of size (N x 2)
-        coordinates to whose respect the derivatives of prediction are calculated. First column is time, space second column.
-    prediction : tensor of size (N x 1)
-        dataset whose derivatives are to be calculated.
-    library_config : dict
-        dictionary containing options for the library function.
-    Returns
-    -------
-    time_deriv: tensor of size (N x 1)
-        First temporal derivative of prediction.
-    u : tensor of (N X (M+1))
-        Tensor containing derivatives.
-    '''
-    max_order = library_config['diff_order']
-    
+def library_deriv(data, prediction, max_order):
     dy = grad(prediction, data, grad_outputs=torch.ones_like(prediction), create_graph=True)[0]
     time_deriv = dy[:, 0:1]
     
@@ -50,26 +28,7 @@ def library_deriv(data, prediction, library_config):
     return time_deriv, du
 
 
-def library_1D_in(input, library_config):
-    '''
-    Calculates a library function for a 1D+1 input for M coupled equations consisting of all polynomials up to order K and derivatives up to order
-    L and all possible combinations (i.e. combining two terms) of these.
-    Parameters
-    ----------
-    data : tensor of size (N x 2)
-        coordinates to whose respect the derivatives of prediction are calculated. First column is time, space second column.
-    prediction : tensor of size (N x M)
-        dataset from which the library is constructed.
-    library_config : dict
-        dictionary containing options for the library function.
-    Returns
-    -------
-    time_deriv_list : tensor list of length of M
-        list containing the time derivatives, each entry corresponds to an equation.
-    theta : tensor
-        library matrix tensor.
-    '''
-
+def library_1D_in(input, poly_order, diff_order):
     prediction, data = input
     poly_list = []
     deriv_list = []
@@ -77,8 +36,8 @@ def library_1D_in(input, library_config):
 
     # Creating lists for all outputs
     for output in torch.arange(prediction.shape[1]):
-        time_deriv, du = library_deriv(data, prediction[:, output:output+1], library_config)
-        u = library_poly(prediction[:, output:output+1], library_config)
+        time_deriv, du = library_deriv(data, prediction[:, output:output+1], diff_order)
+        u = library_poly(prediction[:, output:output+1], poly_order)
 
         poly_list.append(u)
         deriv_list.append(du)
@@ -100,17 +59,15 @@ def library_1D_in(input, library_config):
 
 
 
-def library_2Din_1Dout(data, prediction, library_config):
+def library_2Din_1Dout(input, poly_order, diff_order):
         '''
         Constructs a library graph in 1D. Library config is dictionary with required terms.
         '''
-
+        prediction, data = input
         # Polynomial
         
-        max_order = library_config['poly_order']
         u = torch.ones_like(prediction)
-
-        for order in np.arange(1, max_order+1):
+        for order in np.arange(1, poly_order+1):
             u = torch.cat((u, u[:, order-1:order] * prediction), dim=1)
 
         # Gradients

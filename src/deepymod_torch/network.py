@@ -9,7 +9,7 @@ class Library(nn.Module):
         self.library_args = library_args
 
     def forward(self, input):
-        time_deriv_list, theta = self.library_func(input, self.library_args)
+        time_deriv_list, theta = self.library_func(input, **self.library_args)
         return time_deriv_list, theta
 
 

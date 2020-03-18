@@ -34,7 +34,9 @@ config = {'n_in': 2, 'hidden_dims': [20, 20, 20, 20, 20, 20], 'n_out': 1, 'libra
 
 model = DeepMod(**config)
 optimizer = torch.optim.Adam([{'params': model.network_parameters(), 'lr':0.002}, {'params': model.coeff_vector(), 'lr':0.002}])
+#train_mse(model, X_train, y_train, optimizer, 1000)
 train_deepmod(model, X_train, y_train, optimizer, 1000, {'l1': 1e-5})
+
 
 print()
 print(model.fit.sparsity_mask) 
