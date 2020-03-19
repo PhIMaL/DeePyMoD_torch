@@ -6,8 +6,8 @@ import torch
 
 # DeepMoD stuff
 from deepymod_torch.DeepMod import DeepMod
-from deepymod_torch.library_functions import library_basic
-from deepymod_torch.utilities import create_deriv_data
+from deepymod_torch.library_functions import library_1D_in
+from deepymod_torch.training import train_deepmod, train_mse
 
 # Setting cuda
 if torch.cuda.is_available():
@@ -26,18 +26,18 @@ y = np.real(data['u']).reshape((data['u'].size, 1))
 number_of_samples = 1000
 
 idx = np.random.permutation(y.size)
-X_train = torch.tensor(X[idx, :][:number_of_samples], dtype=torch.float32)
-y_train = torch.tensor(y[idx, :][:number_of_samples], dtype=torch.float32)
+X_train = torch.tensor(X[idx, :][:number_of_samples], dtype=torch.float32, requires_grad=True)
+y_train = torch.tensor(y[idx, :][:number_of_samples], dtype=torch.float32, requires_grad=True)
 
 ## Running DeepMoD
-config = {'input_dim': 2, 'hidden_dim': 20, 'layers': 5, 'output_dim': 1, 'library_function': library_basic, 'library_args':{'poly_order': 2, 'diff_order': 2}}
+config = {'n_in': 2, 'hidden_dims': [20, 20, 20, 20, 20, 20], 'n_out': 1, 'library_function': library_1D_in, 'library_args':{'poly_order': 2, 'diff_order': 2}}
 
-X_input = create_deriv_data(X_train, config['library_args']['diff_order'])
+model = DeepMod(**config)
+optimizer = torch.optim.Adam([{'params': model.network_parameters(), 'lr':0.002}, {'params': model.coeff_vector(), 'lr':0.002}])
+#train_mse(model, X_train, y_train, optimizer, 1000)
+train_deepmod(model, X_train, y_train, optimizer, 1000, {'l1': 1e-5})
 
-model = DeepMod(config)
-optimizer = torch.optim.Adam(model.parameters(), lr=0.002)
-model.train(X_input, y_train, optimizer, 5000, type='deepmod')
 
 print()
-print(model.sparsity_mask_list) 
-print(model.coeff_vector_list)
+print(model.fit.sparsity_mask) 
+print(model.fit.coeff_vector)

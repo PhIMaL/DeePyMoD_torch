@@ -5,10 +5,10 @@ from deepymod_torch.output import Tensorboard, progress
 from deepymod_torch.losses import reg_loss, mse_loss, l1_loss
 from deepymod_torch.sparsity import scaling, threshold
 
-def train(data, target, model, optimizer, max_iterations, loss_func_args):
+def train(model, data, target, optimizer, max_iterations, loss_func_args={'l1':1e-5}):
     '''Trains the deepmod model with MSE, regression and l1 cost function. Updates model in-place.'''
     start_time = time.time()
-    number_of_terms = [coeff_vec.shape[0] for coeff_vec in model[-1].coeff_vector_list]
+    number_of_terms = [coeff_vec.shape[0] for coeff_vec in model(data)[3]]
     board = Tensorboard(number_of_terms)
 
     # Training
@@ -20,7 +20,7 @@ def train(data, target, model, optimizer, max_iterations, loss_func_args):
         
         # Calculating loss
         loss_reg = reg_loss(time_deriv_list, sparse_theta_list, coeff_vector_list)
-        loss_mse = mse_loss(prediction[0], target)
+        loss_mse = mse_loss(prediction, target)
         loss_l1 = l1_loss(coeff_vector_scaled_list, loss_func_args['l1'])
         loss = torch.sum(loss_reg) + torch.sum(loss_mse) + torch.sum(loss_l1)
         
@@ -35,10 +35,10 @@ def train(data, target, model, optimizer, max_iterations, loss_func_args):
         optimizer.step()
     board.close()
 
-def train_mse(data, target, model, optimizer, max_iterations, loss_func_args):
+def train_mse(model, data, target, optimizer, max_iterations, loss_func_args={}):
     '''Trains the deepmod model only on the MSE. Updates model in-place.'''
     start_time = time.time()
-    number_of_terms = [coeff_vec.shape[0] for coeff_vec in model[-1].coeff_vector_list]
+    number_of_terms = [coeff_vec.shape[0] for coeff_vec in model(data)[3]]
     board = Tensorboard(number_of_terms)
 
     # Training
@@ -49,7 +49,7 @@ def train_mse(data, target, model, optimizer, max_iterations, loss_func_args):
         coeff_vector_scaled_list = scaling(coeff_vector_list, sparse_theta_list, time_deriv_list) 
 
         # Calculating loss
-        loss_mse = mse_loss(prediction[0], target)
+        loss_mse = mse_loss(prediction, target)
         loss = torch.sum(loss_mse)
 
         # Writing
@@ -63,21 +63,23 @@ def train_mse(data, target, model, optimizer, max_iterations, loss_func_args):
         optimizer.step()
     board.close()
 
-def train_deepmod(data, target, model, optimizer, max_iterations, loss_func_args):
+def train_deepmod(model, data, target, optimizer, max_iterations, loss_func_args):
     '''Performs full deepmod cycle: trains model, thresholds and trains again for unbiased estimate. Updates model in-place.'''
     # Train first cycle and get prediction
-    train(data, target, model, optimizer, max_iterations, loss_func_args)
+    train(model, data, target, optimizer, max_iterations, loss_func_args)
     prediction, time_deriv_list, sparse_theta_list, coeff_vector_list = model(data)
 
     # Threshold, set sparsity mask and coeff vector
     sparse_coeff_vector_list, sparsity_mask_list = threshold(coeff_vector_list, sparse_theta_list, time_deriv_list)
-    model[-1].sparsity_mask_list = sparsity_mask_list
-    model[-1].coeff_vector_list = torch.nn.ParameterList(sparse_coeff_vector_list)
+    model.fit.sparsity_mask = sparsity_mask_list
+    model.fit.coeff_vector = torch.nn.ParameterList(sparse_coeff_vector_list)
+   
     print()
     print(sparse_coeff_vector_list)
     print(sparsity_mask_list)
+
     #Resetting optimizer for different shapes, train without l1 
     optimizer.param_groups[0]['params'] = model.parameters()
     print() #empty line for correct printing
-    train(data, target, model, optimizer, max_iterations, dict(loss_func_args, **{'l1':0.0}))
+    train(model, data, target, optimizer, max_iterations, dict(loss_func_args, **{'l1': 0.0}))
 

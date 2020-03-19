@@ -1,49 +1,44 @@
 import torch
 import torch.nn as nn
-from deepymod_torch.training import train, train_mse, train_deepmod
-from deepymod_torch.network import Linear, Tanh
-from deepymod_torch.utilities import create_deriv_data
+from deepymod_torch.network import Fitting, Library
+
 
 class DeepMod(nn.Module):
     ''' Class based interface for deepmod.'''
-    def __init__(self, config):
+    def __init__(self, n_in, hidden_dims, n_out, library_function, library_args):
         super().__init__()
-        self.network = build_network(**config)
-
-    def train(self, data, target, optimizer, max_iterations, type='single_cycle', loss_func_args={'l1':10**-5}):
-        if type == 'mse':
-            train_mse(data, target, self.network, optimizer, max_iterations, loss_func_args={}) # Trains only mse.
-        elif type == 'single_cycle':
-            train(data, target, self.network, optimizer, max_iterations, loss_func_args) #DeepMod style training, but doesn't threshold.
-        elif type == 'deepmod':
-            train_deepmod(data, target, self.network, optimizer, max_iterations, loss_func_args) # Does full deepmod cycle.
+        self.network = self.build_network(n_in, hidden_dims, n_out)
+        self.library = Library(library_function, library_args)
+        self.fit = self.build_fit_layer(n_in, n_out, library_function, library_args)
 
     def forward(self, input):
-        output = self.network(input)
-        return output
+        prediction = self.network(input)
+        time_deriv, theta = self.library((prediction, input))
+        sparse_theta, coeff_vector = self.fit(theta)
+        return prediction, time_deriv, sparse_theta, coeff_vector
 
-    # Properties below implemented for easy access
-    @property
-    def coeff_vector_list(self):
-        return self.network[-1].coeff_vector_list
-    
-    @property
-    def sparsity_mask_list(self):
-        return self.network[-1].sparsity_mask_list
+    def build_network(self, n_in, hidden_dims, n_out):
+        # NN
+        network = []
+        hs = [n_in] + hidden_dims + [n_out]
+        for h0, h1 in zip(hs, hs[1:]):  # Hidden layers
+            network.append(nn.Linear(h0, h1))
+            network.append(nn.Tanh())
+        network.pop()  # get rid of last activation function
+        network = nn.Sequential(*network) 
 
+        return network
 
-def build_network(input_dim, hidden_dim, layers, output_dim, library_function, library_args):
-    ''' Build deepmod model.'''
-    network = [Linear(input_dim, hidden_dim), Tanh()]  # Input layer
-    for hidden_layer in torch.arange(layers):  # Hidden layers
-        network.append(Linear(hidden_dim, hidden_dim))
-        network.append(Tanh())
-    network.append(Linear(hidden_dim, output_dim))  # Output layer
-    
-    network.append(library_function(input_dim, output_dim, **library_args)) # Library layer
-    torch_network = nn.Sequential(*network)
+    def build_fit_layer(self, n_in, n_out, library_function, library_args):
+        sample_input = torch.ones((1, n_in), dtype=torch.float32, requires_grad=True)
+        n_terms = self.library((self.network(sample_input), sample_input))[1].shape[1] # do sample pass to infer shapes
+        fit_layer = Fitting(n_terms, n_out)
 
-    return torch_network
+        return fit_layer
 
+    # Function below make life easier
+    def network_parameters(self):
+        return self.network.parameters()
 
-
+    def coeff_vector(self):
+        return self.fit.coeff_vector.parameters()
