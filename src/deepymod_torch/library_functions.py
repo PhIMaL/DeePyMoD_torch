@@ -55,6 +55,7 @@ def library_1D_in(input, poly_order, diff_order):
         theta_dudv = torch.cat([torch.matmul(du[:, :, None], dv[:, None, :]).view(samples, -1)[:, 1:] for du, dv in combinations(deriv_list, 2)], 1) # calculate all unique combinations of derivatives
         theta_udu = torch.cat([torch.matmul(u[:, 1:, None], du[:, None, 1:]).view(samples, (poly_list[0].shape[1]-1) * (deriv_list[0].shape[1]-1)) for u, dv in product(poly_list, deriv_list)], 1)  # calculate all unique products of polynomials and derivatives
         theta = torch.cat([theta_uv, theta_dudv, theta_udu], dim=1)
+        
     return time_deriv_list, theta
 
 
@@ -87,32 +88,3 @@ def library_2Din_1Dout(input, poly_order, diff_order):
         
         return [u_t], theta
     
-
-
-def library_ODE(input, poly_order, diff_order):
-    '''
-    Calculates polynomials of function u up to order M of given input, including M=0. Each column corresponds to power, i.e.
-    the columns correspond to [1, u, u^2... , u^M].
-
-    Parameters
-    ----------
-    prediction : tensor of size (N x 1)
-        dataset whose polynomials are to be calculated.
-    library_config : dict
-        dictionary containing options for the library function.
-
-    Returns
-    -------
-    u : tensor of (N X (M+1))
-        Tensor containing polynomials.
-    '''
-    time_deriv_list = []
-    theta_list = []
-       
-    # Creating lists for all outputs
-    
-    for output in torch.arange(prediction.shape[1]):
-        time_deriv, theta = library_1D_in(input, poly_order, diff_order)
-        time_deriv_list.extend(time_deriv)
-        theta_list.append(theta)
-    return time_deriv_list, theta_list
