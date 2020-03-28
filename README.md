@@ -1,5 +1,7 @@
 # DeePyMoD
 
+## Deep learning based model discovery for ODEs and PDEs
+
 DeePyMoD is a PyTorch-based implementation of the DeepMoD algorithm for model discovery of PDEs and ODEs. We use a neural network to model our dataset, build a library of possible terms from the networks output and employ sparse regression to find the PDE underlying the dataset. More information can be found in our paper: [arXiv:1904.09406](http://arxiv.org/abs/1904.09406) 
 
 **What's the use case?** Classical Model Discovery methods struggle with elevated noise levels and sparse datasets due the low accuracy of numerical differentiation. DeepMoD can handle high noise and sparse datasets, making it well suited for model discovery on actual experimental data.
