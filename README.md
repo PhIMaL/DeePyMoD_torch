@@ -1,8 +1,8 @@
 # DeePyMoD
 
-DeePyMoD is a PyTorch-based implementation of the DeepMoD algorithm for model discovery of PDEs. We use a neural network to model our dataset, build a library of possible terms from the networks output and employ sparse regression to find the PDE underlying the dataset. More information can be found in our paper: [arXiv:1904.09406](http://arxiv.org/abs/1904.09406) 
+DeePyMoD is a PyTorch-based implementation of the DeepMoD algorithm for model discovery of PDEs and ODEs. We use a neural network to model our dataset, build a library of possible terms from the networks output and employ sparse regression to find the PDE underlying the dataset. More information can be found in our paper: [arXiv:1904.09406](http://arxiv.org/abs/1904.09406) 
 
-**What's the use case?** Classical Model Discovery methods such as PDE-find struggle with elevated noise levels and sparse datasets due the low accuracy of numerical differentiation. DeepMoD can handle high noise and sparse datasets, making it well suited for model discovery on actual experimental data.
+**What's the use case?** Classical Model Discovery methods struggle with elevated noise levels and sparse datasets due the low accuracy of numerical differentiation. DeepMoD can handle high noise and sparse datasets, making it well suited for model discovery on actual experimental data.
 
 **What types of models can you discover?** DeepMoD can discover non-linear, multi-dimensional and/or coupled PDEs. See our paper for a demonstration of each.
 
@@ -12,13 +12,15 @@ DeePyMoD is a PyTorch-based implementation of the DeepMoD algorithm for model di
 
 # Features
 
-* **Fast** We implemented a neural network which also calculates the derivatives w.r.t. input on the forward pass. This saves a lot of calculations, making DeePyMoD at least 30% faster than a standard implementation.
+* **Many example notebooks** We have implemented a varyity of examples ranging from 2D Advection Diffusion, Burgers' equation to non-linear, higher order ODE's If you miss any example, don't hesitate to give us a heads-up.
 
 * **Extendable** DeePyMoD is designed to be easily extendable and modifiable. You can simply plug in your own cost function, library or training regime.
 
 * **Automatic library** The library and coefficient vectors are automatically constructed from the maximum order of polynomial and differentiation. If that doesn't cut it for your use case, it's easy to plug in your own library function.
 
 * **Extensive logging** We provide a simple command line logger to see how training is going and an extensive custom Tensorboard logger.
+
+* **Fast** Depending on the size of the data-set DeepMoD, running a model search with DeepMoD takes of the order of minutes/ tens of minutes on a standard CPU. Running the code on GPU's drastically improves performence. 
 
 # How to install
 We provide two ways to use DeePyMoD, either as a package or in a ready-to-use Docker container. 
