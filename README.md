@@ -6,7 +6,7 @@ DeePyMoD is a PyTorch-based implementation of the DeepMoD algorithm for model di
 
 **What's the use case?** Classical Model Discovery methods struggle with elevated noise levels and sparse datasets due the low accuracy of numerical differentiation. DeepMoD can handle high noise and sparse datasets, making it well suited for model discovery on actual experimental data.
 
-**What types of models can you discover?** DeepMoD can discover non-linear, multi-dimensional and/or coupled PDEs. See our paper for a demonstration of each.
+**What types of models can you discover?** DeepMoD can discover non-linear, multi-dimensional and/or coupled ODEs and PDEs. See our paper and the examples folder for a demonstration of each.
 
 **How hard is it to apply it to my data?** Not at all! We've designed the code to be accessible without having in-depth knowledge of deep learning or model discovery. You can load in the data, train the model and get the result in a few lines of code. We include a few notebooks with examples in the examples folder. Feel free to open an issue if you need any additional help.
 
