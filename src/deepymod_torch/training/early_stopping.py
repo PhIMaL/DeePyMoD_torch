@@ -1,6 +1,7 @@
 import numpy as np
 import torch
 
+
 class EarlyStopping:
     """Early stops the training if validation loss doesn't improve after a given patience."""
     def __init__(self, patience=50, delta=1e-2, initial_epoch=1000, sparsity_update_period=500):

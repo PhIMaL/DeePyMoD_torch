@@ -4,9 +4,9 @@ import torch
 
 # DeepMoD stuff
 from deepymod_torch import DeepMoD
-from deepymod_torch.model.networks import NN
-from deepymod_torch.model.library import library_1D_in, Library
-from deepymod_torch.model.constraint import LstSq
+from deepymod_torch.model.func_approx import NN
+from deepymod_torch.model.library import Library1D
+from deepymod_torch.model.constraint import LeastSquares
 from deepymod_torch.model.sparse_estimators import Clustering
 from deepymod_torch.training import train
 
@@ -37,10 +37,9 @@ X_train, y_train = dataset.create_dataset(x_grid.reshape(-1, 1), t_grid.reshape(
 
 # Configuring model
 network = NN(2, [30, 30, 30, 30, 30], 1)
-library = Library(library_1D_in, poly_order=2, diff_order=3)
+library = Library1D(diff_order=3, poly_order=2)
 estimator = Clustering()
-constraint = LstSq()
-
+constraint = LeastSquares()
 model = DeepMoD(network, library, estimator, constraint)
 
 # Running model

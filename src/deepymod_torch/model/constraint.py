@@ -1,23 +1,10 @@
 import torch
-import torch.nn as nn
+from deepymod_torch import Constraint
 
 
-class LstSq(nn.Module):
+class LeastSquares(Constraint):
     def __init__(self):
         super().__init__()
-        self.sparsity_masks = None
-
-    def forward(self, input):
-        time_derivs, thetas = input
-        sparse_thetas = self.apply_mask(thetas)
-        self.coeff_vectors = self.calculate_coeffs(sparse_thetas, time_derivs)
-        return sparse_thetas, self.coeff_vectors
-
-    def apply_mask(self, thetas):
-        if self.sparsity_masks is None:
-            self.sparsity_masks = [torch.ones(theta.shape[1], dtype=torch.bool) for theta in thetas]
-        sparse_theta = [theta[:, sparsity_mask] for theta, sparsity_mask in zip(thetas, self.sparsity_masks)]
-        return sparse_theta
 
     def calculate_coeffs(self, sparse_thetas, time_derivs):
         opt_coeff = []

@@ -10,4 +10,4 @@ except DistributionNotFound:
 finally:
     del get_distribution, DistributionNotFound
 
-from .deepmod import DeepMoD
+from .model.deepmod import *

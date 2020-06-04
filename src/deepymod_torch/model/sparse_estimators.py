@@ -3,19 +3,20 @@ We keep the API in line with scikit learn (mostly), so scikit learn can also be 
 See scikitlearn.linear_models for applicable estimators.'''
 
 import numpy as np
+from deepymod_torch import Estimator
 from sklearn.cluster import KMeans
 from pysindy.optimizers import STLSQ
 from sklearn.linear_model import LassoCV
 from sklearn.model_selection import train_test_split
-
 import warnings
 warnings.filterwarnings("ignore", category=UserWarning)  # To silence annoying pysindy warnings
 
 
-class Threshold:
+class Threshold(Estimator):
     '''Performs additional thresholding on coefficient result from estimator. Basically
     a thin wrapper around the given estimator. '''
     def __init__(self, threshold=0.1, estimator=LassoCV(cv=5, fit_intercept=False)):
+        super().__init__()
         self.estimator = estimator
         self.threshold = threshold
 
@@ -30,10 +31,13 @@ class Threshold:
         return self
 
 
-class Clustering():
+class Clustering(Estimator):
     ''' Performs additional thresholding by clustering on coefficient result from estimator. Basically
-    a thin wrapper around the given estimator. Results are fitted to two groups: components to keep and components to throw.'''
+    a thin wrapper around the given estimator. Results are fitted to two groups:
+    components to keep and components to throw.
+    '''
     def __init__(self, estimator=LassoCV(cv=5, fit_intercept=False)):
+        super().__init__()
         self.estimator = estimator
         self.kmeans = KMeans(n_clusters=2)
 
