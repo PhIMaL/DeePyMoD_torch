@@ -1,6 +1,7 @@
-from itertools import product, combinations
-import sys
+from itertools import product, combinations, chain
 import torch
+import torch.nn as nn
+
 
 def string_matmul(list_1, list_2):
     ''' Matrix multiplication with strings.'''
@@ -19,19 +20,4 @@ def terms_definition(poly_list, deriv_list):
         theta = theta_uv + theta_dudv + theta_udu
     return theta
 
-def create_deriv_data(X, max_order):
-    '''
-    Automatically creates data-deriv tuple to feed to derivative network. 
-    Shape before network is (sample x order x input).
-    Shape after network will be (sample x order x input x output).
-    '''
-    
-    if max_order == 1:
-        dX = (torch.eye(X.shape[1]) * torch.ones(X.shape[0])[:, None, None])[:, None, :]
-    else: 
-        dX = [torch.eye(X.shape[1]) * torch.ones(X.shape[0])[:, None, None]]
-        dX.extend([torch.zeros_like(dX[0]) for order in range(max_order-1)])
-        dX = torch.stack(dX, dim=1)
-        
-    return (X, dX)
 

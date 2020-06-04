@@ -3,6 +3,7 @@ import sys, time
 import torch
 from torch.utils.tensorboard import SummaryWriter
 
+
 class Tensorboard():
     '''Tensorboard class for logging during deepmod training. '''
     def __init__(self, number_of_terms):
@@ -24,6 +25,7 @@ class Tensorboard():
     def close(self):
         self.writer.close()
 
+
 def custom_board(number_of_terms):
     '''Custom scalar board for tensorboard.'''
     number_of_eqs = len(number_of_terms)
@@ -40,11 +42,3 @@ def custom_board(number_of_terms):
         custom_board['Scaled coefficients']['Vector_' + str(idx)] = ['Multiline', ['scaled_coeff_' + str(idx) + '_' + str(element_idx) for element_idx in np.arange(number_of_terms[idx])]]
 
     return custom_board
-
-def progress(iteration, start_time, max_iteration, cost, MSE, PI, L1):
-    '''Prints and updates progress of training cycle in command line.'''
-    percent = iteration.item()/max_iteration * 100
-    elapsed_time = time.time() - start_time
-    time_left = elapsed_time * (max_iteration/iteration - 1) if iteration.item() != 0 else 0
-    sys.stdout.write(f"\r  {iteration:>9}   {percent:>7.2f}%   {time_left:>13.0f}s   {cost:>8.2e}   {MSE:>8.2e}   {PI:>8.2e}   {L1:>8.2e} ")
-    sys.stdout.flush()

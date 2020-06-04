@@ -1,13 +1,16 @@
-# Burgers, tests 1D input
-
 # General imports
 import numpy as np
 import torch
 
 # DeepMoD stuff
-from deepymod_torch.DeepMod import DeepMod
-from deepymod_torch.library_functions import library_1D_in
-from deepymod_torch.training import train_deepmod, train_mse
+from deepymod_torch import DeepMoD
+from deepymod_torch.model.networks import NN
+from deepymod_torch.model.library import library_1D_in, Library
+from deepymod_torch.model.constraint import LstSq
+from deepymod_torch.model.sparse_estimators import Clustering
+
+from phimal_utilities.data import Dataset
+from phimal_utilities.data.burgers import BurgersDelta
 
 # Setting cuda
 if torch.cuda.is_available():
@@ -19,25 +22,25 @@ torch.manual_seed(0)
 torch.backends.cudnn.deterministic = True
 torch.backends.cudnn.benchmark = False
 
-# Loading data
-data = np.load('data/burgers.npy', allow_pickle=True).item()
-X = np.transpose((data['t'].flatten(), data['x'].flatten()))
-y = np.real(data['u']).reshape((data['u'].size, 1))
-number_of_samples = 1000
+# Making data
+v = 0.1
+A = 1.0
 
-idx = np.random.permutation(y.size)
-X_train = torch.tensor(X[idx, :][:number_of_samples], dtype=torch.float32, requires_grad=True)
-y_train = torch.tensor(y[idx, :][:number_of_samples], dtype=torch.float32, requires_grad=True)
+# Making grid
+x = np.linspace(-3, 4, 100)
+t = np.linspace(0.5, 5.0, 50)
+x_grid, t_grid = np.meshgrid(x, t, indexing='ij')
+dataset = Dataset(BurgersDelta, v=v, A=A)
 
-## Running DeepMoD
-config = {'n_in': 2, 'hidden_dims': [20, 20, 20, 20, 20, 20], 'n_out': 1, 'library_function': library_1D_in, 'library_args':{'poly_order': 2, 'diff_order': 2}}
+X_train, y_train = dataset.create_dataset(x_grid.reshape(-1, 1), t_grid.reshape(-1, 1), n_samples=1000, noise=1e-3)
 
-model = DeepMod(**config)
-optimizer = torch.optim.Adam([{'params': model.network_parameters(), 'lr':0.002}, {'params': model.coeff_vector(), 'lr':0.002}])
-#train_mse(model, X_train, y_train, optimizer, 1000)
-train_deepmod(model, X_train, y_train, optimizer, 1000, {'l1': 1e-5})
+# Configuring model
+network = NN(2, [30, 30, 30, 30, 30], 1)
+library = Library(library_1D_in, poly_order=1, diff_order=2)
+estimator = Clustering()
+constraint = LstSq()
 
+model = DeepMoD(network, library, estimator, constraint)
 
-print()
-print(model.fit.sparsity_mask) 
-print(model.fit.coeff_vector)
+# Running model
+print(model(X_train))
