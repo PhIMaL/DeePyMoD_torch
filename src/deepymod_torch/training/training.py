@@ -36,9 +36,14 @@ def train(model, data, target, optimizer, sparsity_scheduler, log_dir=None, max_
                      torch.sum(MSE).item(), torch.sum(Reg).item(), torch.sum(l1_norm).item())
 
             # We pad the sparse vectors with zeros so they get written correctly)
-            coeff_vectors_padded = [torch.zeros(mask.size()).masked_scatter_(mask, coeff_vector.detach().squeeze())
-                                    for mask, coeff_vector in zip(model.constraint.sparsity_masks, constraint_coeffs)]
-            board.write(iteration, loss, MSE, Reg, l1_norm, coeff_vectors_padded, coeff_vectors_padded)
+            constraint_coeff_vectors = [torch.zeros(mask.size()).masked_scatter_(mask, coeff_vector.detach().squeeze())
+                                        for mask, coeff_vector
+                                        in zip(model.constraint.sparsity_masks, constraint_coeffs)]
+            unscaled_constraint_coeff_vectors = [torch.zeros(mask.size()).masked_scatter_(mask, coeff_vector.detach().squeeze()) / norm.squeeze()
+                                                 for mask, coeff_vector, norm
+                                                 in zip(model.constraint.sparsity_masks, constraint_coeffs, model.library.norms)]
+
+            board.write(iteration, loss, MSE, Reg, l1_norm, constraint_coeff_vectors, unscaled_constraint_coeff_vectors)
 
         # ================== Validation and sparsity =============
         # Updating sparsity and or convergence
