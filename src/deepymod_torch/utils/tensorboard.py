@@ -1,26 +1,34 @@
 import numpy as np
-import sys, time
 import torch
 from torch.utils.tensorboard import SummaryWriter
 
 
 class Tensorboard():
     '''Tensorboard class for logging during deepmod training. '''
-    def __init__(self, number_of_terms):
-        self.writer = SummaryWriter()
+    def __init__(self, number_of_terms, log_dir):
+        self.writer = SummaryWriter(log_dir)
         self.writer.add_custom_scalars(custom_board(number_of_terms))
 
-    def write(self, iteration, loss, loss_mse, loss_reg, loss_l1, coeff_vector_list, coeff_vector_scaled_list):
-        # Logs losses, costs and coeff vectors.
+    def write(self, iteration, loss, loss_mse, loss_reg, loss_l1, coeff_vector_list, coeff_vector_scaled_list, **kwargs):
+        # Stuff for custom board.
         self.writer.add_scalar('Total loss', loss, iteration)
         for idx in range(len(loss_mse)):
             self.writer.add_scalar('MSE '+str(idx), loss_mse[idx], iteration)
             self.writer.add_scalar('Regression '+str(idx), loss_reg[idx], iteration)
             self.writer.add_scalar('L1 '+str(idx), loss_l1[idx], iteration)
-            for element_idx, element in enumerate(torch.unbind(coeff_vector_list[idx])): # Tensorboard doesnt have vectors, so we unbind and plot them in together in custom board
+            for element_idx, element in enumerate(torch.unbind(coeff_vector_list[idx])):  # Tensorboard doesnt have vectors, so we unbind and plot them in together in custom board
                 self.writer.add_scalar('coeff ' + str(idx) + ' ' + str(element_idx), element, iteration)
             for element_idx, element in enumerate(torch.unbind(coeff_vector_scaled_list[idx])):
                 self.writer.add_scalar('scaled_coeff ' + str(idx) + ' ' + str(element_idx), element, iteration)
+
+        # Writing remaining kwargs
+        for key, value in kwargs.items():
+            assert len(value.squeeze().shape) <= 1, 'writing matrices is not supported.'
+            if len(value.squeeze().shape) == 0:  # if scalar
+                self.writer.add_scalar(key, value, iteration)
+            else:  # else its a vector and we have to unbind
+                for element_idx, element in enumerate(torch.unbind(value)):
+                    self.writer.add_scalar(key + f'_{element_idx}', element, iteration)
 
     def close(self):
         self.writer.close()
