@@ -53,3 +53,5 @@ MANIFEST
 src/deepymod_torch/.ipynb_checkpoints/
 
 tests/datasets/.ipynb_checkpoints/
+
+.mypy_cache/
