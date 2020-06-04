@@ -52,7 +52,7 @@ class Clustering(Estimator):
         if clusters[max_idx] != 1:
             clusters = ~clusters
 
-        coeffs = clusters.astype(np.float32) 
+        coeffs = clusters.astype(np.float32)
         return coeffs
 
 

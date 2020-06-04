@@ -38,15 +38,15 @@ def custom_board(number_of_terms):
     '''Custom scalar board for tensorboard.'''
     number_of_eqs = len(number_of_terms)
     # Initial setup, including all the costs and losses
-    custom_board = {'Costs': {'MSE': ['Multiline', [f'MSE_{idx}' for idx in np.arange(number_of_eqs)]],
-                              'Regression': ['Multiline', [f'Regression_{idx}' for idx in np.arange(number_of_eqs)]],
-                              'L1': ['Multiline', [f'L1_{idx}' for idx in np.arange(number_of_eqs)]]},
+    custom_board = {'Costs': {'MSE': ['Multiline', [f'MSE {idx}' for idx in np.arange(number_of_eqs)]],
+                              'Regression': ['Multiline', [f'Regression {idx}' for idx in np.arange(number_of_eqs)]],
+                              'L1': ['Multiline', [f'L1 {idx}' for idx in np.arange(number_of_eqs)]]},
                     'Coefficients': {},
                     'Scaled coefficients': {}}
 
     # Add plot of normal and scaled coefficients for each equation, containing every component in single plot.
     for idx in np.arange(number_of_eqs):
-        custom_board['Coefficients'][f'Vector_{idx}'] = ['Multiline', [f'coeff_{idx}_{element_idx}' for element_idx in np.arange(number_of_terms[idx])]]
-        custom_board['Scaled coefficients'][f'Vector_{idx}'] = ['Multiline', [f'scaled_coeff_{idx}_{element_idx}' for element_idx in np.arange(number_of_terms[idx])]]
+        custom_board['Coefficients'][f'Vector {idx}'] = ['Multiline', [f'coeff {idx} {element_idx}' for element_idx in np.arange(number_of_terms[idx])]]
+        custom_board['Scaled coefficients'][f'Vector {idx}'] = ['Multiline', [f'scaled_coeff {idx} {element_idx}' for element_idx in np.arange(number_of_terms[idx])]]
 
     return custom_board
