@@ -7,8 +7,9 @@ from deepymod_torch import DeepMoD
 from deepymod_torch.model.func_approx import NN
 from deepymod_torch.model.library import Library1D
 from deepymod_torch.model.constraint import LeastSquares
-from deepymod_torch.model.sparse_estimators import Clustering
+from deepymod_torch.model.sparse_estimators import Clustering, Threshold
 from deepymod_torch.training import train
+from deepymod_torch.training.sparsity_scheduler import Periodic
 
 from phimal_utilities.data import Dataset
 from phimal_utilities.data.burgers import BurgersDelta
@@ -37,11 +38,12 @@ X_train, y_train = dataset.create_dataset(x_grid.reshape(-1, 1), t_grid.reshape(
 
 # Configuring model
 network = NN(2, [30, 30, 30, 30, 30], 1)
-library = Library1D(diff_order=3, poly_order=2)
+library = Library1D(poly_order=2, diff_order=3)
 estimator = Clustering()
 constraint = LeastSquares()
 model = DeepMoD(network, library, estimator, constraint)
 
 # Running model
-optimizer = torch.optim.Adam(model.parameters(), betas=(0.99, 0.999), amsgrad=True)
-train(model, X_train, y_train, optimizer, 20000)
+sparsity_scheduler = Periodic(initial_epoch=1000, periodicity=250)
+optimizer = torch.optim.Adam(model.parameters(), betas=(0.99, 0.99), amsgrad=True)
+train(model, X_train, y_train, optimizer, sparsity_scheduler, log_dir='tests/runs/')

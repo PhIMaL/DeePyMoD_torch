@@ -24,11 +24,10 @@ class Threshold(Estimator):
         self.estimator.set_params(fit_intercept=False)
 
     def fit(self, X, y):
-        coeff = self.estimator.fit(X, y).coef_
-        coeff[np.abs(coeff) < self.threshold] = 0.0
+        coeffs = self.estimator.fit(X, y).coef_
+        coeffs[np.abs(coeffs) < self.threshold] = 0.0
 
-        self.coef_ = coeff  # to keep in line width sklearn
-        return self
+        return coeffs
 
 
 class Clustering(Estimator):
@@ -45,16 +44,16 @@ class Clustering(Estimator):
         self.estimator.set_params(fit_intercept=False)
 
     def fit(self, X, y):
-        coeff = self.estimator.fit(X, y).coef_[:, None]  # sklearn returns 1D
-        clusters = self.kmeans.fit_predict(np.abs(coeff)).astype(np.bool)
+        coeffs = self.estimator.fit(X, y).coef_[:, None]  # sklearn returns 1D
+        clusters = self.kmeans.fit_predict(np.abs(coeffs)).astype(np.bool)
 
         # make sure terms to keep are 1 and to remove are 0
-        max_idx = np.argmax(np.abs(coeff))
+        max_idx = np.argmax(np.abs(coeffs))
         if clusters[max_idx] != 1:
             clusters = ~clusters
 
-        self.coef_ = clusters.astype(np.float32)  # to keep in line with sklearn
-        return self
+        coeffs = clusters.astype(np.float32) 
+        return coeffs
 
 
 class PDEFIND():
