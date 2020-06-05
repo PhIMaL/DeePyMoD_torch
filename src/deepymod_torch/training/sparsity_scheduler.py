@@ -3,6 +3,9 @@ import numpy as np
 
 
 class Periodic:
+    '''Controls when to apply sparsity. Initial_epoch is first time of appliance,
+    then every periodicity epochs.
+    '''
     def __init__(self, initial_epoch=1000, periodicity=100):
         self.initial_epoch = initial_epoch
         self.periodicity = periodicity

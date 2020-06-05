@@ -4,7 +4,7 @@ from typing import List
 
 
 class NN(nn.Module):
-    ''' Neural network implementation for deepmod.'''
+    ''' Neural network function approximator.'''
     def __init__(self, n_in: int, n_hidden: List[int], n_out: int) -> None:
         super().__init__()
         self.network = self.build_network(n_in, n_hidden, n_out)

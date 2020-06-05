@@ -3,6 +3,9 @@ from deepymod_torch import Constraint
 
 
 class LeastSquares(Constraint):
+    ''' Calculates coefficients of constraint via least squares
+        using QR decomposition. 
+    '''
     def __init__(self):
         super().__init__()
 

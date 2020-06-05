@@ -2,6 +2,9 @@ import torch
 
 
 class Convergence:
+    '''Implements convergence criterium. Convergence is when change in patience
+    epochs is smaller than delta.
+    '''
     def __init__(self, patience=100, delta=0.05):
         self.patience = patience
         self.delta = delta

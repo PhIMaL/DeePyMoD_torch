@@ -33,6 +33,9 @@ def library_deriv(data, prediction, max_order):
 
 # ========================= Actual library functions ========================
 class Library1D(Library):
+    ''' Calculates library consisting of m-th order polynomials,
+        n-th order derivatives and their cross terms.
+    '''
     def __init__(self, poly_order, diff_order):
         super().__init__()
         self.poly_order = poly_order

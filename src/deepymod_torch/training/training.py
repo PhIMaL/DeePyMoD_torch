@@ -55,8 +55,8 @@ def train(model, data, target, optimizer, sparsity_scheduler, log_dir=None, max_
                 print(model.constraint.sparsity_masks)
 
         # Checking convergence
-        converged = convergence(iteration, torch.sum(l1_norm))
-        if converged:
+        convergence(iteration, torch.sum(l1_norm))
+        if convergence.converged is True:
             print('Algorithm converged. Stopping training.')
             break
 

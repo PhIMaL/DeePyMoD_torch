@@ -1,8 +1,13 @@
 import torch.nn as nn
 import torch
 
+''' This file contains the building blocks for the deepmod framework. These are all abstract
+    classes and implement the flow logic, rather than the specifics.
+'''
+
 
 class DeepMoD(nn.Module):
+    '''Implements the deepmod model and connects all the separate elements.'''
     def __init__(self, function_approximator, library, sparsity_estimator, constraint):
         super().__init__()
         self.func_approx = function_approximator
@@ -31,6 +36,9 @@ class Library(nn.Module):
 
 
 class Constraint(nn.Module):
+    ''' Constraint layer which applies sparsity mask and calculates
+        the coefficients.
+    '''
     def __init__(self):
         super().__init__()
         self.sparsity_masks = None
@@ -51,6 +59,9 @@ class Constraint(nn.Module):
 
 
 class Estimator(nn.Module):
+    ''' Estimator layer which implements calculation
+        of sparsity mask.
+    '''
     def __init__(self):
         super().__init__()
 

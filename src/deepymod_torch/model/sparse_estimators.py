@@ -8,13 +8,13 @@ from sklearn.cluster import KMeans
 from pysindy.optimizers import STLSQ
 from sklearn.linear_model import LassoCV
 from sklearn.model_selection import train_test_split
+
 import warnings
 warnings.filterwarnings("ignore", category=UserWarning)  # To silence annoying pysindy warnings
 
 
 class Base(Estimator):
-    '''Performs additional thresholding on coefficient result from estimator. Basically
-    a thin wrapper around the given estimator. '''
+    '''Simple wrapper class for scikit learn estimators for sparse estimator component.'''
     def __init__(self, estimator):
         super().__init__()
         self.estimator = estimator
@@ -70,6 +70,7 @@ class Clustering(Estimator):
 
 
 class PDEFIND():
+    ''' Implements PDEFIND as a sparse estimator.'''
     def __init__(self, lam=1e-5, dtol=1, **kwargs):
         self.lam = lam
         self.dtol = dtol
