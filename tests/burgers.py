@@ -4,10 +4,12 @@ import torch
 
 # DeepMoD stuff
 from deepymod_torch import DeepMoD
+
 from deepymod_torch.model.func_approx import NN
 from deepymod_torch.model.library import Library1D
 from deepymod_torch.model.constraint import LeastSquares
 from deepymod_torch.model.sparse_estimators import Clustering, Threshold
+
 from deepymod_torch.training import train
 from deepymod_torch.training.sparsity_scheduler import Periodic
 
@@ -34,16 +36,20 @@ t = np.linspace(0.5, 5.0, 50)
 x_grid, t_grid = np.meshgrid(x, t, indexing='ij')
 dataset = Dataset(BurgersDelta, v=v, A=A)
 
-X_train, y_train = dataset.create_dataset(x_grid.reshape(-1, 1), t_grid.reshape(-1, 1), n_samples=1000, noise=0.1)
+X_train, y_train = dataset.create_dataset(x_grid.reshape(-1, 1), t_grid.reshape(-1, 1), n_samples=1000, noise=1.0)
+
+#y = np.concatenate([y.detach().cpu().numpy(), y.detach().cpu().detach()], axis=1)
+#y_train = torch.tensor(y, requires_grad=True, dtype=torch.float32)
+
 
 # Configuring model
 network = NN(2, [30, 30, 30, 30, 30], 1)
-library = Library1D(poly_order=2, diff_order=3)
+library = Library1D(poly_order=1, diff_order=2)
 estimator = Clustering()
 constraint = LeastSquares()
 model = DeepMoD(network, library, estimator, constraint)
 
 # Running model
-sparsity_scheduler = Periodic(initial_epoch=1000, periodicity=250)
-optimizer = torch.optim.Adam(model.parameters(), betas=(0.99, 0.99), amsgrad=True)
+sparsity_scheduler = Periodic(initial_epoch=1000, periodicity=100)
+optimizer = torch.optim.Adam(model.parameters(), betas=(0.99, 0.999), amsgrad=True)
 train(model, X_train, y_train, optimizer, sparsity_scheduler, log_dir='tests/runs/')

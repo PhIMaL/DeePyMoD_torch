@@ -65,7 +65,7 @@ class Library1D(Library):
             theta_udu = torch.cat([torch.matmul(u[:, 1:, None], du[:, None, 1:]).view(samples, (poly_list[0].shape[1]-1) * (deriv_list[0].shape[1]-1)) for u, dv in product(poly_list, deriv_list)], 1)  # calculate all unique products of polynomials and derivatives
             theta = torch.cat([theta_uv, theta_dudv, theta_udu], dim=1)
 
-        return time_deriv_list, [theta]
+        return time_deriv_list, theta
 
 
 def library_2Din_1Dout(input, poly_order, diff_order):

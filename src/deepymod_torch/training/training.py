@@ -39,9 +39,9 @@ def train(model, data, target, optimizer, sparsity_scheduler, log_dir=None, max_
             constraint_coeff_vectors = [torch.zeros(mask.size()).masked_scatter_(mask, coeff_vector.detach().squeeze())
                                         for mask, coeff_vector
                                         in zip(model.constraint.sparsity_masks, constraint_coeffs)]
-            unscaled_constraint_coeff_vectors = [torch.zeros(mask.size()).masked_scatter_(mask, coeff_vector.detach().squeeze()) / norm.squeeze()
-                                                 for mask, coeff_vector, norm
-                                                 in zip(model.constraint.sparsity_masks, constraint_coeffs, model.library.norms)]
+            unscaled_constraint_coeff_vectors = [torch.zeros(mask.size()).masked_scatter_(mask, coeff_vector.detach().squeeze()) / model.library.norm.squeeze()
+                                                 for mask, coeff_vector
+                                                 in zip(model.constraint.sparsity_masks, constraint_coeffs)]
 
             board.write(iteration, loss, MSE, Reg, l1_norm, constraint_coeff_vectors, unscaled_constraint_coeff_vectors)
 
