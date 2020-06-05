@@ -19,5 +19,4 @@ class Convergence:
         else:
             self.start_l1 = l1_norm
             self.counter = 0
-        return self.converged
         
