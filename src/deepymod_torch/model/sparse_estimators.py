@@ -12,6 +12,19 @@ import warnings
 warnings.filterwarnings("ignore", category=UserWarning)  # To silence annoying pysindy warnings
 
 
+class Base(Estimator):
+    '''Performs additional thresholding on coefficient result from estimator. Basically
+    a thin wrapper around the given estimator. '''
+    def __init__(self, estimator):
+        super().__init__()
+        self.estimator = estimator
+        self.estimator.set_params(fit_intercept=False) # Library contains offset so turn off the intercept
+
+    def fit(self, X, y):
+        coeffs = self.estimator.fit(X, y).coef_
+        return coeffs
+
+
 class Threshold(Estimator):
     '''Performs additional thresholding on coefficient result from estimator. Basically
     a thin wrapper around the given estimator. '''
@@ -63,9 +76,8 @@ class PDEFIND():
         self.kwargs = kwargs
 
     def fit(self, X, y):
-        coeff = PDEFIND.TrainSTLSQ(X, y[:, None], self.lam, self.dtol, **self.kwargs)
-        self.coef_ = coeff.squeeze()
-        return self
+        coeffs = PDEFIND.TrainSTLSQ(X, y[:, None], self.lam, self.dtol, **self.kwargs)
+        return coeffs.squeeze()
 
     @staticmethod
     def TrainSTLSQ(X, y, alpha=1e-5, delta_threshold=1.0, max_iterations=100, test_size=0.2, random_state=0):
