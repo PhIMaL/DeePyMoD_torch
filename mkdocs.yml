@@ -1,0 +1,21 @@
+site_name: DeePyMoD
+nav:
+    - Home: index.md
+    - Background:
+        - DeepMoD: background/deepmod.md
+        - Group sparsity: background/group_sparsity.md
+    - API: api.md
+    - Examples: 
+        - Burgers: examples/Burgers/PDE_Burgers.md
+        - Korteweg-de Vries: examples/kdv/PDE_KdV.md
+
+theme:
+    name: "material"
+      
+plugins:
+    - search
+    - mkdocstrings
+
+repo_url: "https://github.com/PhIMaL/DeePyMoD_torch"
+      
+
