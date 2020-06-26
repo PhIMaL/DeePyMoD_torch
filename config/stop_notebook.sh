@@ -1,0 +1,1 @@
+docker stop deepymod_pytorch
