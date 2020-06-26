@@ -25,5 +25,6 @@ plugins:
     - mkdocstrings
 
 repo_url: "https://github.com/PhIMaL/DeePyMoD_torch"
+site_url: "https://phimal.github.io/DeePyMoD_torch/"
       
 
