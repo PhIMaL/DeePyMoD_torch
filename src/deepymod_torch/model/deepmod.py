@@ -1,9 +1,9 @@
-import torch.nn as nn
-import torch
-
 ''' This file contains the building blocks for the deepmod framework. These are all abstract
     classes and implement the flow logic, rather than the specifics.
 '''
+
+import torch.nn as nn
+import torch
 
 
 class DeepMoD(nn.Module):

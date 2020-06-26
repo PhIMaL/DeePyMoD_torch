@@ -7,6 +7,7 @@ from deepymod_torch.utils.output import progress
 from deepymod_torch.training.convergence import Convergence
 
 def train(model, data, target, optimizer, sparsity_scheduler, log_dir=None, max_iterations=10000, **convergence_kwargs):
+    '''Function to train model.'''
     start_time = time.time()
     number_of_terms = [coeff_vec.shape[0] for coeff_vec in model(data)[3]]
     board = Tensorboard(number_of_terms, log_dir)  # initializing custom tb board
