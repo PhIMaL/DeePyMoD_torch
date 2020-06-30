@@ -350,7 +350,7 @@ print(X.shape, y.shape)
 </code></pre>
 <pre><code>(102912, 2) (102912, 1)
 </code></pre>
-<p>As we can see, $X$ has 2 dimensions, ${x, t}$, while $y$ has only one, ${u}$. Always explicity set the shape (i.e. $N\times 1$, not $N$) or you'll get errors. This dataset is noiseless, so let's add $5\%$ noise:</p>
+<p>As we can see, <span><span class="MathJax_Preview">X</span><script type="math/tex">X</script></span> has 2 dimensions, <span><span class="MathJax_Preview">\{x, t\}</span><script type="math/tex">\{x, t\}</script></span>, while <span><span class="MathJax_Preview">y</span><script type="math/tex">y</script></span> has only one, <span><span class="MathJax_Preview">\{u\}</span><script type="math/tex">\{u\}</script></span>. Always explicity set the shape (i.e. <span><span class="MathJax_Preview">N\times 1</span><script type="math/tex">N\times 1</script></span>, not <span><span class="MathJax_Preview">N</span><script type="math/tex">N</script></span>) or you'll get errors. This dataset is noiseless, so let's add <span><span class="MathJax_Preview">5\%</span><script type="math/tex">5\%</script></span> noise:</p>
 <pre><code class="python">noise_level = 0.05
 y_noisy = y + noise_level * np.std(y) * np.random.randn(y[:,0].size, 1)
 </code></pre>
@@ -471,5 +471,6 @@ tensor([[-0.7742],
           }, typeof search !== "undefined" && search)
         })
       </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 </body>
 </html>
