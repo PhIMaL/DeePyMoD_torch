@@ -17,9 +17,9 @@ class DeepMoD(nn.Module):
 
     def forward(self, input):
         prediction = self.func_approx(input)
-        time_derivs, theta = self.library((prediction, input))
-        sparse_thetas, constraint_coeffs = self.constraint((time_derivs, theta))
-        return prediction, time_derivs, sparse_thetas, theta, constraint_coeffs
+        time_derivs, thetas = self.library((prediction, input))
+        sparse_thetas, constraint_coeffs = self.constraint((time_derivs, thetas))
+        return prediction, time_derivs, sparse_thetas, thetas, constraint_coeffs
 
 
 class Library(nn.Module):
@@ -29,15 +29,15 @@ class Library(nn.Module):
         self.norms = None
 
     def forward(self, input):
-        time_derivs, theta = self.library(input)
-        theta_norm = torch.norm(theta, dim=0, keepdim=True)
+        time_derivs, thetas = self.library(input)
+        theta_norms = [torch.norm(theta, dim=0, keepdim=True) for theta in thetas]
         time_deriv_norms = [torch.norm(dt) for dt in time_derivs]
 
-        normed_theta = theta / theta_norm
+        normed_thetas = [theta / norm for theta, norm in zip(thetas, theta_norms)]
         normed_time_derivs = [dt / norm for dt, norm in zip(time_derivs, time_deriv_norms)]
-        self.norms = [theta_norm / dt_norm for dt_norm in time_deriv_norms]
+        self.norms = [theta_norm / dt_norm for theta_norm, dt_norm in zip(theta_norms, time_deriv_norms)]
        
-        return normed_time_derivs, normed_theta
+        return normed_time_derivs, normed_thetas
 
 
 class Constraint(nn.Module):
@@ -49,17 +49,17 @@ class Constraint(nn.Module):
         self.sparsity_masks = None
 
     def forward(self, input):
-        time_derivs, theta = input
+        time_derivs, thetas = input
 
         if self.sparsity_masks is None:
-            self.sparsity_masks = [torch.ones(theta.shape[1], dtype=torch.bool) for _ in torch.arange(len(time_derivs))]
+            self.sparsity_masks = [torch.ones(theta.shape[1], dtype=torch.bool) for theta in thetas]
 
-        sparse_thetas = self.apply_mask(theta)
+        sparse_thetas = self.apply_mask(thetas)
         self.coeff_vectors = self.calculate_coeffs(sparse_thetas, time_derivs)
         return sparse_thetas, self.coeff_vectors
 
-    def apply_mask(self, theta):
-        sparse_thetas = [theta[:, sparsity_mask] for sparsity_mask in self.sparsity_masks]
+    def apply_mask(self, thetas):
+        sparse_thetas = [theta[:, sparsity_mask] for theta, sparsity_mask in zip(thetas, self.sparsity_masks)]
         return sparse_thetas
 
 
@@ -70,9 +70,9 @@ class Estimator(nn.Module):
     def __init__(self):
         super().__init__()
 
-    def forward(self, theta, time_derivs):
+    def forward(self, thetas, time_derivs):
         self.coeff_vectors = [self.fit(theta.detach().cpu(), time_deriv.squeeze().detach().cpu())
-                              for time_deriv in time_derivs]
+                              for theta, time_deriv in zip(thetas, time_derivs)]
         sparsity_masks = [torch.tensor(coeff_vector != 0.0, dtype=torch.bool)
                           for coeff_vector in self.coeff_vectors]
 

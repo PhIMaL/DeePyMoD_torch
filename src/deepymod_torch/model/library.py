@@ -69,7 +69,7 @@ class Library1D(Library):
             # theta = torch.cat([theta_uv, theta_dudv, theta_udu], dim=1)
             theta = torch.cat([theta_uv, theta_dudv], dim=1)
 
-        return time_deriv_list, theta
+        return time_deriv_list, [theta]
 
 
 class Library2D(Library):
@@ -103,4 +103,4 @@ class Library2D(Library):
         # Bringing it together
         theta = torch.matmul(u[:, :, None], du[:, None, :]).view(samples, -1)
 
-        return [u_t], theta
+        return [u_t], [theta]
