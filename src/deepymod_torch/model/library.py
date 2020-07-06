@@ -1,14 +1,24 @@
 import numpy as np
 import torch
 from torch.autograd import grad
-from itertools import combinations, product
+from itertools import combinations
 from functools import reduce
 from .deepmod import Library
+from typing import Tuple
+from ..utils.types import TensorList
 
 
 # ==================== Library helper functions =======================
-def library_poly(prediction, max_order):
-    # Calculate the polynomes of u
+def library_poly(prediction: torch.Tensor, max_order: int) -> torch.Tensor:
+    """[summary]
+
+    Args:
+        prediction (torch.Tensor): [description]
+        max_order (int): [description]
+
+    Returns:
+        torch.Tensor: [description]
+    """
     u = torch.ones_like(prediction)
     for order in np.arange(1, max_order+1):
         u = torch.cat((u, u[:, order-1:order] * prediction), dim=1)
@@ -16,7 +26,17 @@ def library_poly(prediction, max_order):
     return u
 
 
-def library_deriv(data, prediction, max_order):
+def library_deriv(data: torch.Tensor, prediction: torch.Tensor, max_order: int) -> Tuple[torch.Tensor, torch.Tensor]:
+    """[summary]
+
+    Args:
+        data (torch.Tensor): [description]
+        prediction (torch.Tensor): [description]
+        max_order (int): [description]
+
+    Returns:
+        Tuple[torch.Tensor, torch.Tensor]: [description]
+    """
     dy = grad(prediction, data, grad_outputs=torch.ones_like(prediction), create_graph=True)[0]
     time_deriv = dy[:, 0:1]
 
@@ -33,15 +53,25 @@ def library_deriv(data, prediction, max_order):
 
 # ========================= Actual library functions ========================
 class Library1D(Library):
-    ''' Calculates library consisting of m-th order polynomials,
-        n-th order derivatives and their cross terms.
-    '''
-    def __init__(self, poly_order, diff_order):
+    """[summary]
+
+    Args:
+        Library ([type]): [description]
+    """
+    def __init__(self, poly_order: int, diff_order: int) -> None:
         super().__init__()
         self.poly_order = poly_order
         self.diff_order = diff_order
 
-    def library(self, input):
+    def library(self, input: Tuple[torch.Tensor, torch.Tensor]) -> Tuple[TensorList, TensorList]:
+        """[summary]
+
+        Args:
+            input (Tuple[torch.Tensor, torch.Tensor]): [description]
+
+        Returns:
+            Tuple[TensorList, TensorList]: [description]
+        """
         prediction, data = input
         poly_list = []
         deriv_list = []
@@ -73,13 +103,26 @@ class Library1D(Library):
 
 
 class Library2D(Library):
-    def __init__(self, poly_order, diff_order):
+    """[summary]
+
+    Args:
+        Library ([type]): [description]
+    """
+    def __init__(self, poly_order: int, diff_order: int) -> None:
         super().__init__()
         self.poly_order = poly_order
         self.diff_order = diff_order
 
-    def library(self, input):
-        '''Constructs a library graph in 1D. Library config is dictionary with required terms. '''
+    def library(self, input: Tuple[torch.Tensor, torch.Tensor]) -> Tuple[TensorList, TensorList]:
+        """[summary]
+
+        Args:
+            input (Tuple[torch.Tensor, torch.Tensor]): [description]
+
+        Returns:
+            Tuple[TensorList, TensorList]: [description]
+        """
+
         prediction, data = input
         # Polynomial
 

@@ -1,23 +1,24 @@
-'''This module contains the '''
-
-
 import torch
 from .deepmod import Constraint
+from ..utils.types import TensorList
 
 
 class LeastSquares(Constraint):
-    ''' Calculates coefficients of constraint via least squares
-        using QR decomposition. 
-    '''
-    def __init__(self):
+    """[summary]
+
+    Args:
+        Constraint ([type]): [description]
+    """
+
+    def __init__(self) -> None:
         super().__init__()
 
-    def calculate_coeffs(self, sparse_thetas, time_derivs):
+    def calculate_coeffs(self, sparse_thetas: TensorList, time_derivs: TensorList) -> TensorList:
         """[summary]
 
         Args:
-            sparse_thetas (List[]): [description]
-            time_derivs ([type]): [description]
+            sparse_thetas (TensorList): [description]
+            time_derivs (TensorList): [description]
 
         Returns:
             [type]: [description]

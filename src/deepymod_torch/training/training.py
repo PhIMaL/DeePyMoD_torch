@@ -5,8 +5,10 @@ from math import pi
 from ..utils.tensorboard import Tensorboard
 from ..utils.output import progress
 from .convergence import Convergence
+from ..model.deepmod import DeepMoD
+from typing import Optional
 
-def train(model, data, target, optimizer, sparsity_scheduler, log_dir=None, max_iterations=10000, **convergence_kwargs):
+def train(model: DeepMoD, data: torch.Tensor, target: torch.Tensor, optimizer, sparsity_scheduler, log_dir: Optional[str] = None, max_iterations: int = 10000, **convergence_kwargs) -> None:
     '''Function to train model.'''
     start_time = time.time()
     number_of_terms = [coeff_vec.shape[0] for coeff_vec in model(data)[3]]

@@ -8,19 +8,33 @@ from sklearn.cluster import KMeans
 from pysindy.optimizers import STLSQ
 from sklearn.linear_model import LassoCV
 from sklearn.model_selection import train_test_split
+from sklearn.base import BaseEstimator
 
 import warnings
 warnings.filterwarnings("ignore", category=UserWarning)  # To silence annoying pysindy warnings
 
 
 class Base(Estimator):
-    '''Simple wrapper class for scikit learn estimators for sparse estimator component.'''
-    def __init__(self, estimator):
+    """[summary]
+
+    Args:
+        Estimator ([type]): [description]
+    """
+    def __init__(self, estimator: BaseEstimator) -> None:
         super().__init__()
         self.estimator = estimator
-        self.estimator.set_params(fit_intercept=False) # Library contains offset so turn off the intercept
+        self.estimator.set_params(fit_intercept=False)  # Library contains offset so turn off the intercept
 
-    def fit(self, X, y):
+    def fit(self, X: np.ndarray, y: np.ndarray) -> np.ndarray:
+        """[summary]
+
+        Args:
+            X (np.ndarray): [description]
+            y (np.ndarray): [description]
+
+        Returns:
+            np.ndarray: [description]
+        """
         coeffs = self.estimator.fit(X, y).coef_
         return coeffs
 
@@ -28,7 +42,7 @@ class Base(Estimator):
 class Threshold(Estimator):
     '''Performs additional thresholding on coefficient result from estimator. Basically
     a thin wrapper around the given estimator. '''
-    def __init__(self, threshold=0.1, estimator=LassoCV(cv=5, fit_intercept=False)):
+    def __init__(self, threshold: float = 0.1, estimator: BaseEstimator = LassoCV(cv=5, fit_intercept=False)) -> None:
         super().__init__()
         self.estimator = estimator
         self.threshold = threshold
@@ -36,7 +50,16 @@ class Threshold(Estimator):
         # Library contains offset so turn off the intercept
         self.estimator.set_params(fit_intercept=False)
 
-    def fit(self, X, y):
+    def fit(self, X: np.ndarray, y: np.ndarray) -> np.ndarray:
+        """[summary]
+
+        Args:
+            X (np.ndarray): [description]
+            y (np.ndarray): [description]
+
+        Returns:
+            np.ndarray: [description]
+        """
         coeffs = self.estimator.fit(X, y).coef_
         coeffs[np.abs(coeffs) < self.threshold] = 0.0
 
@@ -48,7 +71,7 @@ class Clustering(Estimator):
     a thin wrapper around the given estimator. Results are fitted to two groups:
     components to keep and components to throw.
     '''
-    def __init__(self, estimator=LassoCV(cv=5, fit_intercept=False)):
+    def __init__(self, estimator: BaseEstimator = LassoCV(cv=5, fit_intercept=False)) -> None:
         super().__init__()
         self.estimator = estimator
         self.kmeans = KMeans(n_clusters=2)
@@ -56,7 +79,16 @@ class Clustering(Estimator):
         # Library contains offset so turn off the intercept
         self.estimator.set_params(fit_intercept=False)
 
-    def fit(self, X, y):
+    def fit(self, X: np.ndarray, y: np.ndarray) -> np.ndarray:
+        """[summary]
+
+         Args:
+             X (np.ndarray): [description]
+             y (np.ndarray): [description]
+
+         Returns:
+             np.ndarray: [description]
+        """
         coeffs = self.estimator.fit(X, y).coef_[:, None]  # sklearn returns 1D
         clusters = self.kmeans.fit_predict(np.abs(coeffs)).astype(np.bool)
 
@@ -71,18 +103,39 @@ class Clustering(Estimator):
 
 class PDEFIND():
     ''' Implements PDEFIND as a sparse estimator.'''
-    def __init__(self, lam=1e-5, dtol=1, **kwargs):
+    def __init__(self, lam: float = 1e-3, dtol: float = 0.1) -> None:
         self.lam = lam
         self.dtol = dtol
-        self.kwargs = kwargs
 
-    def fit(self, X, y):
-        coeffs = PDEFIND.TrainSTLSQ(X, y[:, None], self.lam, self.dtol, **self.kwargs)
+    def fit(self, X: np.ndarray, y: np.ndarray) -> np.ndarray:
+        """[summary]
+
+        Args:
+            X (np.ndarray): [description]
+            y (np.ndarray): [description]
+
+        Returns:
+            np.ndarray: [description]
+        """
+        coeffs = PDEFIND.TrainSTLSQ(X, y[:, None], self.lam, self.dtol)
         return coeffs.squeeze()
 
     @staticmethod
-    def TrainSTLSQ(X, y, alpha=1e-5, delta_threshold=1.0, max_iterations=100, test_size=0.2, random_state=0):
-        '''Train STLSQ. Assumes data already normalized'''
+    def TrainSTLSQ(X: np.ndarray, y: np.ndarray, alpha: float, delta_threshold: float, max_iterations: int = 100, test_size: float = 0.2, random_state: int = 0) -> np.ndarray:
+        """[summary]
+
+        Args:
+            X (np.ndarray): [description]
+            y (np.ndarray): [description]
+            alpha (float): [description]
+            delta_threshold (float): [description]
+            max_iterations (int, optional): [description]. Defaults to 100.
+            test_size (float, optional): [description]. Defaults to 0.2.
+            random_state (int, optional): [description]. Defaults to 0.
+
+        Returns:
+            np.ndarray: [description]
+        """
         # Split data
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=random_state)
 
