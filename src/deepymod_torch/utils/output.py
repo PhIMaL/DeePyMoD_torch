@@ -1,5 +1,6 @@
 import sys, time
 
+
 def progress(iteration, start_time, max_iteration, cost, MSE, PI, L1):
     '''Prints and updates progress of training cycle in command line.'''
     percent = iteration.item()/max_iteration * 100

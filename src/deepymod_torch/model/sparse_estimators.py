@@ -121,7 +121,13 @@ class PDEFIND():
         return coeffs.squeeze()
 
     @staticmethod
-    def TrainSTLSQ(X: np.ndarray, y: np.ndarray, alpha: float, delta_threshold: float, max_iterations: int = 100, test_size: float = 0.2, random_state: int = 0) -> np.ndarray:
+    def TrainSTLSQ(X: np.ndarray,
+                   y: np.ndarray,
+                   alpha: float,
+                   delta_threshold: float,
+                   max_iterations: int = 100,
+                   test_size: float = 0.2,
+                   random_state: int = 0) -> np.ndarray:
         """[summary]
 
         Args:

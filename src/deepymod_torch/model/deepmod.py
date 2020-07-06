@@ -6,9 +6,11 @@ import torch.nn as nn
 import torch
 from typing import Tuple
 from ..utils.types import TensorList
+from abc import ABCMeta, abstractmethod
+import numpy as np
 
 
-class Constraint(nn.Module):
+class Constraint(nn.Module, metaclass=ABCMeta):
     """[summary]
 
     Args:
@@ -16,7 +18,7 @@ class Constraint(nn.Module):
     """
     def __init__(self) -> None:
         super().__init__()
-        self.sparsity_masks = None
+        self.sparsity_masks: TensorList = None
 
     def forward(self, input: Tuple[TensorList, TensorList]) -> Tuple[TensorList, TensorList]:
         """[summary]
@@ -48,8 +50,11 @@ class Constraint(nn.Module):
         sparse_thetas = [theta[:, sparsity_mask] for theta, sparsity_mask in zip(thetas, self.sparsity_masks)]
         return sparse_thetas
 
+    @abstractmethod
+    def calculate_coeffs(self, sparse_thetas: TensorList, time_derivs: TensorList) -> TensorList: pass
 
-class Estimator(nn.Module):
+
+class Estimator(nn.Module,  metaclass=ABCMeta):
     """[summary]
 
     Args:
@@ -75,6 +80,9 @@ class Estimator(nn.Module):
 
         return sparsity_masks
 
+    @abstractmethod
+    def fit(self, X: np.ndarray, y: np.ndarray) -> np.ndarray: pass
+
 
 class Library(nn.Module):
     """[summary]
@@ -84,7 +92,7 @@ class Library(nn.Module):
     """
     def __init__(self) -> None:
         super().__init__()
-        self.norms = None
+        self.norms: TensorList = None
 
     def forward(self, input: Tuple[TensorList, TensorList]) -> Tuple[TensorList, TensorList]:
         """[summary]
@@ -105,6 +113,9 @@ class Library(nn.Module):
 
         return normed_time_derivs, normed_thetas
 
+    @abstractmethod
+    def library(self, input: Tuple[torch.Tensor, torch.Tensor]) -> Tuple[TensorList, TensorList]: pass
+
 
 class DeepMoD(nn.Module):
     """[summary]
@@ -112,7 +123,11 @@ class DeepMoD(nn.Module):
     Args:
         nn ([type]): [description]
     """
-    def __init__(self, function_approximator: torch.nn.Sequential, library: Library, sparsity_estimator: Estimator, constraint: Constraint) -> None:
+    def __init__(self,
+                 function_approximator: torch.nn.Sequential,
+                 library: Library,
+                 sparsity_estimator: Estimator,
+                 constraint: Constraint) -> None:
         super().__init__()
         self.func_approx = function_approximator
         self.library = library

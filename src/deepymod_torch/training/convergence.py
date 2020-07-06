@@ -9,8 +9,8 @@ class Convergence:
     def __init__(self, patience: int = 100, delta: float = 0.05) -> None:
         self.patience = patience
         self.delta = delta
-        self.counter = 0
-        self.start_l1 = None
+        self.counter: int = 0
+        self.start_l1: torch.Tensor = None
         self.converged = False
 
     def __call__(self, epoch: int, l1_norm: torch.Tensor) -> None:

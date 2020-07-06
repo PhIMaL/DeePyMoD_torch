@@ -46,7 +46,8 @@ def library_deriv(data: torch.Tensor, prediction: torch.Tensor, max_order: int) 
         du = torch.cat((torch.ones_like(time_deriv), dy[:, 1:2]), dim=1)
         if max_order > 1:
             for order in np.arange(1, max_order):
-                du = torch.cat((du, grad(du[:, order:order+1], data, grad_outputs=torch.ones_like(prediction), create_graph=True)[0][:, 1:2]), dim=1)
+                du = torch.cat((du, grad(du[:, order:order+1], data,
+                                grad_outputs=torch.ones_like(prediction), create_graph=True)[0][:, 1:2]), dim=1)
 
     return time_deriv, du
 
@@ -78,7 +79,7 @@ class Library1D(Library):
         time_deriv_list = []
 
         # Creating lists for all outputs
-        for output in torch.arange(prediction.shape[1]):
+        for output in np.arange(prediction.shape[1]):
             time_deriv, du = library_deriv(data, prediction[:, output:output+1], self.diff_order)
             u = library_poly(prediction[:, output:output+1], self.poly_order)
 
@@ -91,12 +92,14 @@ class Library1D(Library):
 
         # Calculating theta
         if len(poly_list) == 1:
-            theta = torch.matmul(poly_list[0][:, :, None], deriv_list[0][:, None, :]).view(samples, total_terms)  # If we have a single output, we simply calculate and flatten matrix product between polynomials and derivatives to get library
+            # If we have a single output, we simply calculate and flatten matrix product
+            # between polynomials and derivatives to get library
+            theta = torch.matmul(poly_list[0][:, :, None], deriv_list[0][:, None, :]).view(samples, total_terms)
         else:
             theta_uv = reduce((lambda x, y: (x[:, :, None] @ y[:, None, :]).view(samples, -1)), poly_list)
-            theta_dudv = torch.cat([torch.matmul(du[:, :, None], dv[:, None, :]).view(samples, -1)[:, 1:] for du, dv in combinations(deriv_list, 2)], 1)  # calculate all unique combinations of derivatives
-            # theta_udu = torch.cat([torch.matmul(u[:, 1:, None], du[:, None, 1:]).view(samples, (poly_list[0].shape[1]-1) * (deriv_list[0].shape[1]-1)) for u, dv in product(poly_list, deriv_list)], 1)  # calculate all unique products of polynomials and derivatives
-            # theta = torch.cat([theta_uv, theta_dudv, theta_udu], dim=1)
+            # calculate all unique combinations of derivatives
+            theta_dudv = torch.cat([torch.matmul(du[:, :, None], dv[:, None, :]).view(samples, -1)[:, 1:]
+                                    for du, dv in combinations(deriv_list, 2)], 1)
             theta = torch.cat([theta_uv, theta_dudv], dim=1)
 
         return time_deriv_list, [theta]

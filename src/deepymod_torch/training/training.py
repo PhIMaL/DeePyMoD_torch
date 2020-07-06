@@ -1,6 +1,7 @@
 import torch
 import time
 from math import pi
+import numpy as np
 
 from ..utils.tensorboard import Tensorboard
 from ..utils.output import progress
@@ -8,8 +9,26 @@ from .convergence import Convergence
 from ..model.deepmod import DeepMoD
 from typing import Optional
 
-def train(model: DeepMoD, data: torch.Tensor, target: torch.Tensor, optimizer, sparsity_scheduler, log_dir: Optional[str] = None, max_iterations: int = 10000, **convergence_kwargs) -> None:
-    '''Function to train model.'''
+
+def train(model: DeepMoD,
+          data: torch.Tensor,
+          target: torch.Tensor,
+          optimizer,
+          sparsity_scheduler,
+          log_dir: Optional[str] = None,
+          max_iterations: int = 10000,
+          **convergence_kwargs) -> None:
+    """[summary]
+
+    Args:
+        model (DeepMoD): [description]
+        data (torch.Tensor): [description]
+        target (torch.Tensor): [description]
+        optimizer ([type]): [description]
+        sparsity_scheduler ([type]): [description]
+        log_dir (Optional[str], optional): [description]. Defaults to None.
+        max_iterations (int, optional): [description]. Defaults to 10000.
+    """
     start_time = time.time()
     number_of_terms = [coeff_vec.shape[0] for coeff_vec in model(data)[3]]
     board = Tensorboard(number_of_terms, log_dir)  # initializing custom tb board
@@ -17,10 +36,10 @@ def train(model: DeepMoD, data: torch.Tensor, target: torch.Tensor, optimizer, s
     # Training
     convergence = Convergence(**convergence_kwargs)
     print('| Iteration | Progress | Time remaining |     Loss |      MSE |      Reg |    L1 norm |')
-    for iteration in torch.arange(0, max_iterations + 1):
+    for iteration in np.arange(0, max_iterations + 1):
         # ================== Training Model ============================
         prediction, time_derivs, sparse_thetas, thetas, constraint_coeffs = model(data)
-        
+
         MSE = torch.mean((prediction - target)**2, dim=0)  # loss per output
         Reg = torch.stack([torch.mean((dt - theta @ coeff_vector)**2)
                            for dt, theta, coeff_vector in zip(time_derivs, sparse_thetas, constraint_coeffs)])
