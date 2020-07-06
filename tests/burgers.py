@@ -42,5 +42,5 @@ model = DeepMoD(network, library, estimator, constraint) # Putting it all in the
 
 # Running model
 sparsity_scheduler = Periodic(initial_epoch=1000, periodicity=100) # Defining when to apply sparsity
-optimizer = torch.optim.Adam(model.parameters(), betas=(0.99, 0.99), amsgrad=True) # Defining optimizer
-train(model, X_train, y_train, optimizer, sparsity_scheduler, log_dir='tests/runs/') # Running
+optimizer = torch.optim.Adam(model.parameters(), betas=(0.99, 0.999), amsgrad=True) # Defining optimizer
+train(model, X_train, y_train, optimizer, sparsity_scheduler) # Running
