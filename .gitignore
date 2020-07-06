@@ -59,3 +59,7 @@ tests/datasets/.ipynb_checkpoints/
 *.pt
 
 tests/runs/
+
+site/
+
+tests/data/.DS_Store
