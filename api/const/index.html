@@ -331,15 +331,16 @@
 <h2 class="hidden-toc" href="#deepymod_torch.model.constraint" id="deepymod_torch.model.constraint" style="visibility: hidden; width: 0; height: 0;">
 </h2>
 <div class="doc doc-contents first">
-<p>This module contains the </p>
 <div class="doc doc-children">
 <div class="doc doc-object doc-class">
 <h2 class="doc doc-heading" id="deepymod_torch.model.constraint.LeastSquares">
 <code>LeastSquares</code>
 </h2>
 <div class="doc doc-contents">
-<p>Calculates coefficients of constraint via least squares
-       using QR decomposition. </p>
+<p>[summary]</p>
+<pre><code>!!! args
+    Constraint ([type]): [description]
+</code></pre>
 <div class="doc doc-children">
 <div class="doc doc-object doc-method">
 <h3 class="doc doc-heading" id="deepymod_torch.model.constraint.LeastSquares.calculate_coeffs">
@@ -361,7 +362,7 @@ calculate_coeffs<span class="p">(</span><span class="bp">self</span><span class=
 <tbody>
 <tr>
 <td><code>sparse_thetas</code></td>
-<td><code>List[]</code></td>
+<td><code>&lt;function NewType.&lt;locals&gt;.new_type at 0x10d9c3c20&gt;</code></td>
 <td>
 <p>[description]</p>
 </td>
@@ -369,7 +370,7 @@ calculate_coeffs<span class="p">(</span><span class="bp">self</span><span class=
 </tr>
 <tr>
 <td><code>time_derivs</code></td>
-<td><code>[type]</code></td>
+<td><code>&lt;function NewType.&lt;locals&gt;.new_type at 0x10d9c3c20&gt;</code></td>
 <td>
 <p>[description]</p>
 </td>
@@ -387,10 +388,8 @@ calculate_coeffs<span class="p">(</span><span class="bp">self</span><span class=
 </thead>
 <tbody>
 <tr>
-<td><code>[type]</code></td>
-<td>
-<p>[description]</p>
-</td>
+<td><code>&lt;function NewType.&lt;locals&gt;.new_type at 0x10d9c3c20&gt;</code></td>
+<td></td>
 </tr>
 </tbody>
 </table>
@@ -400,8 +399,7 @@ calculate_coeffs<span class="p">(</span><span class="bp">self</span><span class=
 <tr>
 <td class="linenos">
 <div class="linenodiv">
-<pre><span></span>15
-16
+<pre><span></span>16
 17
 18
 19
@@ -414,17 +412,18 @@ calculate_coeffs<span class="p">(</span><span class="bp">self</span><span class=
 26
 27
 28
-29</pre>
+29
+30</pre>
 </div>
 </td>
 <td class="code">
 <div class="highlight">
-<pre><span></span><code><span class="k">def</span> <span class="nf">calculate_coeffs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sparse_thetas</span><span class="p">,</span> <span class="n">time_derivs</span><span class="p">):</span>
+<pre><span></span><code><span class="k">def</span> <span class="nf">calculate_coeffs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sparse_thetas</span><span class="p">:</span> <span class="n">TensorList</span><span class="p">,</span> <span class="n">time_derivs</span><span class="p">:</span> <span class="n">TensorList</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TensorList</span><span class="p">:</span>
     <span class="sd">"""[summary]</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        sparse_thetas (List[]): [description]</span>
-<span class="sd">        time_derivs ([type]): [description]</span>
+<span class="sd">        sparse_thetas (TensorList): [description]</span>
+<span class="sd">        time_derivs (TensorList): [description]</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        [type]: [description]</span>

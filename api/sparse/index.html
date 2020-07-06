@@ -223,11 +223,29 @@
 <a class="md-nav__link" href="#deepymod_torch.model.sparse_estimators.Base">
     Base
   </a>
+<nav aria-label="Base" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#deepymod_torch.model.sparse_estimators.Base.fit">
+    fit()
+  </a>
+</li>
+</ul>
+</nav>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="#deepymod_torch.model.sparse_estimators.Clustering">
     Clustering
   </a>
+<nav aria-label="Clustering" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#deepymod_torch.model.sparse_estimators.Clustering.fit">
+    fit()
+  </a>
+</li>
+</ul>
+</nav>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="#deepymod_torch.model.sparse_estimators.PDEFIND">
@@ -235,6 +253,11 @@
   </a>
 <nav aria-label="PDEFIND" class="md-nav">
 <ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#deepymod_torch.model.sparse_estimators.PDEFIND.fit">
+    fit()
+  </a>
+</li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="#deepymod_torch.model.sparse_estimators.PDEFIND.TrainSTLSQ">
     TrainSTLSQ()
@@ -247,6 +270,15 @@
 <a class="md-nav__link" href="#deepymod_torch.model.sparse_estimators.Threshold">
     Threshold
   </a>
+<nav aria-label="Threshold" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#deepymod_torch.model.sparse_estimators.Threshold.fit">
+    fit()
+  </a>
+</li>
+</ul>
+</nav>
 </li>
 </ul>
 </nav>
@@ -321,11 +353,29 @@
 <a class="md-nav__link" href="#deepymod_torch.model.sparse_estimators.Base">
     Base
   </a>
+<nav aria-label="Base" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#deepymod_torch.model.sparse_estimators.Base.fit">
+    fit()
+  </a>
+</li>
+</ul>
+</nav>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="#deepymod_torch.model.sparse_estimators.Clustering">
     Clustering
   </a>
+<nav aria-label="Clustering" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#deepymod_torch.model.sparse_estimators.Clustering.fit">
+    fit()
+  </a>
+</li>
+</ul>
+</nav>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="#deepymod_torch.model.sparse_estimators.PDEFIND">
@@ -333,6 +383,11 @@
   </a>
 <nav aria-label="PDEFIND" class="md-nav">
 <ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#deepymod_torch.model.sparse_estimators.PDEFIND.fit">
+    fit()
+  </a>
+</li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="#deepymod_torch.model.sparse_estimators.PDEFIND.TrainSTLSQ">
     TrainSTLSQ()
@@ -345,6 +400,15 @@
 <a class="md-nav__link" href="#deepymod_torch.model.sparse_estimators.Threshold">
     Threshold
   </a>
+<nav aria-label="Threshold" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#deepymod_torch.model.sparse_estimators.Threshold.fit">
+    fit()
+  </a>
+</li>
+</ul>
+</nav>
 </li>
 </ul>
 </nav>
@@ -370,8 +434,106 @@ See scikitlearn.linear_models for applicable estimators.</p>
 <code>Base</code>
 </h2>
 <div class="doc doc-contents">
-<p>Simple wrapper class for scikit learn estimators for sparse estimator component.</p>
+<p>[summary]</p>
+<pre><code>!!! args
+    Estimator ([type]): [description]
+</code></pre>
 <div class="doc doc-children">
+<div class="doc doc-object doc-method">
+<h3 class="doc doc-heading" id="deepymod_torch.model.sparse_estimators.Base.fit">
+<code class="highlight language-python">
+fit<span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> </code>
+</h3>
+<div class="doc doc-contents">
+<p>[summary]</p>
+<p><strong>Parameters:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>X</code></td>
+<td><code>ndarray</code></td>
+<td>
+<p>[description]</p>
+</td>
+<td><em>required</em></td>
+</tr>
+<tr>
+<td><code>y</code></td>
+<td><code>ndarray</code></td>
+<td>
+<p>[description]</p>
+</td>
+<td><em>required</em></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ndarray</code></td>
+<td>
+<p>np.ndarray: [description]</p>
+</td>
+</tr>
+</tbody>
+</table>
+<details class="quote">
+<summary>Source code in <code>deepymod_torch/model/sparse_estimators.py</code></summary>
+<table class="highlighttable">
+<tr>
+<td class="linenos">
+<div class="linenodiv">
+<pre><span></span>28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39</pre>
+</div>
+</td>
+<td class="code">
+<div class="highlight">
+<pre><span></span><code><span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+    <span class="sd">"""[summary]</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        X (np.ndarray): [description]</span>
+<span class="sd">        y (np.ndarray): [description]</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        np.ndarray: [description]</span>
+<span class="sd">    """</span>
+    <span class="n">coeffs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimator</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span><span class="o">.</span><span class="n">coef_</span>
+    <span class="k">return</span> <span class="n">coeffs</span>
+</code></pre>
+</div>
+</td>
+</tr>
+</table>
+</details>
+</div>
+</div>
 </div>
 </div>
 </div>
@@ -384,33 +546,67 @@ See scikitlearn.linear_models for applicable estimators.</p>
    a thin wrapper around the given estimator. Results are fitted to two groups:
    components to keep and components to throw.</p>
 <div class="doc doc-children">
-</div>
-</div>
-</div>
-<div class="doc doc-object doc-class">
-<h2 class="doc doc-heading" id="deepymod_torch.model.sparse_estimators.PDEFIND">
-<code>PDEFIND</code>
-</h2>
-<div class="doc doc-contents">
-<p>Implements PDEFIND as a sparse estimator.</p>
-<div class="doc doc-children">
 <div class="doc doc-object doc-method">
-<h3 class="doc doc-heading" id="deepymod_torch.model.sparse_estimators.PDEFIND.TrainSTLSQ">
+<h3 class="doc doc-heading" id="deepymod_torch.model.sparse_estimators.Clustering.fit">
 <code class="highlight language-python">
-TrainSTLSQ<span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">1e-05</span><span class="p">,</span> <span class="n">delta_threshold</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">max_iterations</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> </code>
-<span class="doc doc-properties">
-<small class="doc doc-property doc-property-staticmethod"><code>staticmethod</code></small>
-</span>
+fit<span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> </code>
 </h3>
 <div class="doc doc-contents">
-<p>Train STLSQ. Assumes data already normalized</p>
+<p>[summary]</p>
+<p><strong>Parameters:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>X</code></td>
+<td><code>ndarray</code></td>
+<td>
+<p>[description]</p>
+</td>
+<td><em>required</em></td>
+</tr>
+<tr>
+<td><code>y</code></td>
+<td><code>ndarray</code></td>
+<td>
+<p>[description]</p>
+</td>
+<td><em>required</em></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ndarray</code></td>
+<td>
+<p>np.ndarray: [description]</p>
+</td>
+</tr>
+</tbody>
+</table>
 <details class="quote">
 <summary>Source code in <code>deepymod_torch/model/sparse_estimators.py</code></summary>
 <table class="highlighttable">
 <tr>
 <td class="linenos">
 <div class="linenodiv">
-<pre><span></span> 83
+<pre><span></span> 82
+ 83
  84
  85
  86
@@ -428,16 +624,109 @@ TrainSTLSQ<span class="p">(</span><span class="n">X</span><span class="p">,</spa
  98
  99
 100
-101
-102
-103
-104
-105
-106
-107
-108
-109
-110
+101</pre>
+</div>
+</td>
+<td class="code">
+<div class="highlight">
+<pre><span></span><code><span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+    <span class="sd">"""[summary]</span>
+
+<span class="sd">     Args:</span>
+<span class="sd">         X (np.ndarray): [description]</span>
+<span class="sd">         y (np.ndarray): [description]</span>
+
+<span class="sd">     Returns:</span>
+<span class="sd">         np.ndarray: [description]</span>
+<span class="sd">    """</span>
+    <span class="n">coeffs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimator</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span><span class="o">.</span><span class="n">coef_</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span>  <span class="c1"># sklearn returns 1D</span>
+    <span class="n">clusters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">kmeans</span><span class="o">.</span><span class="n">fit_predict</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">coeffs</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">bool</span><span class="p">)</span>
+
+    <span class="c1"># make sure terms to keep are 1 and to remove are 0</span>
+    <span class="n">max_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">coeffs</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">clusters</span><span class="p">[</span><span class="n">max_idx</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">clusters</span> <span class="o">=</span> <span class="o">~</span><span class="n">clusters</span>
+
+    <span class="n">coeffs</span> <span class="o">=</span> <span class="n">clusters</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">coeffs</span>
+</code></pre>
+</div>
+</td>
+</tr>
+</table>
+</details>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="doc doc-object doc-class">
+<h2 class="doc doc-heading" id="deepymod_torch.model.sparse_estimators.PDEFIND">
+<code>PDEFIND</code>
+</h2>
+<div class="doc doc-contents">
+<p>Implements PDEFIND as a sparse estimator.</p>
+<div class="doc doc-children">
+<div class="doc doc-object doc-method">
+<h3 class="doc doc-heading" id="deepymod_torch.model.sparse_estimators.PDEFIND.fit">
+<code class="highlight language-python">
+fit<span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> </code>
+</h3>
+<div class="doc doc-contents">
+<p>[summary]</p>
+<p><strong>Parameters:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>X</code></td>
+<td><code>ndarray</code></td>
+<td>
+<p>[description]</p>
+</td>
+<td><em>required</em></td>
+</tr>
+<tr>
+<td><code>y</code></td>
+<td><code>ndarray</code></td>
+<td>
+<p>[description]</p>
+</td>
+<td><em>required</em></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ndarray</code></td>
+<td>
+<p>np.ndarray: [description]</p>
+</td>
+</tr>
+</tbody>
+</table>
+<details class="quote">
+<summary>Source code in <code>deepymod_torch/model/sparse_estimators.py</code></summary>
+<table class="highlighttable">
+<tr>
+<td class="linenos">
+<div class="linenodiv">
+<pre><span></span>110
 111
 112
 113
@@ -447,14 +736,217 @@ TrainSTLSQ<span class="p">(</span><span class="n">X</span><span class="p">,</spa
 117
 118
 119
-120</pre>
+120
+121</pre>
+</div>
+</td>
+<td class="code">
+<div class="highlight">
+<pre><span></span><code><span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+    <span class="sd">"""[summary]</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        X (np.ndarray): [description]</span>
+<span class="sd">        y (np.ndarray): [description]</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        np.ndarray: [description]</span>
+<span class="sd">    """</span>
+    <span class="n">coeffs</span> <span class="o">=</span> <span class="n">PDEFIND</span><span class="o">.</span><span class="n">TrainSTLSQ</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">lam</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtol</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">coeffs</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
+</code></pre>
+</div>
+</td>
+</tr>
+</table>
+</details>
+</div>
+</div>
+<div class="doc doc-object doc-method">
+<h3 class="doc doc-heading" id="deepymod_torch.model.sparse_estimators.PDEFIND.TrainSTLSQ">
+<code class="highlight language-python">
+TrainSTLSQ<span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">delta_threshold</span><span class="p">,</span> <span class="n">max_iterations</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> </code>
+<span class="doc doc-properties">
+<small class="doc doc-property doc-property-staticmethod"><code>staticmethod</code></small>
+</span>
+</h3>
+<div class="doc doc-contents">
+<p>[summary]</p>
+<p><strong>Parameters:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>X</code></td>
+<td><code>ndarray</code></td>
+<td>
+<p>[description]</p>
+</td>
+<td><em>required</em></td>
+</tr>
+<tr>
+<td><code>y</code></td>
+<td><code>ndarray</code></td>
+<td>
+<p>[description]</p>
+</td>
+<td><em>required</em></td>
+</tr>
+<tr>
+<td><code>alpha</code></td>
+<td><code>float</code></td>
+<td>
+<p>[description]</p>
+</td>
+<td><em>required</em></td>
+</tr>
+<tr>
+<td><code>delta_threshold</code></td>
+<td><code>float</code></td>
+<td>
+<p>[description]</p>
+</td>
+<td><em>required</em></td>
+</tr>
+<tr>
+<td><code>max_iterations</code></td>
+<td><code>int</code></td>
+<td>
+<p>[description]. Defaults to 100.</p>
+</td>
+<td><code>100</code></td>
+</tr>
+<tr>
+<td><code>test_size</code></td>
+<td><code>float</code></td>
+<td>
+<p>[description]. Defaults to 0.2.</p>
+</td>
+<td><code>0.2</code></td>
+</tr>
+<tr>
+<td><code>random_state</code></td>
+<td><code>int</code></td>
+<td>
+<p>[description]. Defaults to 0.</p>
+</td>
+<td><code>0</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ndarray</code></td>
+<td>
+<p>np.ndarray: [description]</p>
+</td>
+</tr>
+</tbody>
+</table>
+<details class="quote">
+<summary>Source code in <code>deepymod_torch/model/sparse_estimators.py</code></summary>
+<table class="highlighttable">
+<tr>
+<td class="linenos">
+<div class="linenodiv">
+<pre><span></span>123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179</pre>
 </div>
 </td>
 <td class="code">
 <div class="highlight">
 <pre><span></span><code><span class="nd">@staticmethod</span>
-<span class="k">def</span> <span class="nf">TrainSTLSQ</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">,</span> <span class="n">delta_threshold</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">max_iterations</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-    <span class="sd">'''Train STLSQ. Assumes data already normalized'''</span>
+<span class="k">def</span> <span class="nf">TrainSTLSQ</span><span class="p">(</span><span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+               <span class="n">y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+               <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+               <span class="n">delta_threshold</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+               <span class="n">max_iterations</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
+               <span class="n">test_size</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.2</span><span class="p">,</span>
+               <span class="n">random_state</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+    <span class="sd">"""[summary]</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        X (np.ndarray): [description]</span>
+<span class="sd">        y (np.ndarray): [description]</span>
+<span class="sd">        alpha (float): [description]</span>
+<span class="sd">        delta_threshold (float): [description]</span>
+<span class="sd">        max_iterations (int, optional): [description]. Defaults to 100.</span>
+<span class="sd">        test_size (float, optional): [description]. Defaults to 0.2.</span>
+<span class="sd">        random_state (int, optional): [description]. Defaults to 0.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        np.ndarray: [description]</span>
+<span class="sd">    """</span>
     <span class="c1"># Split data</span>
     <span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="n">test_size</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="n">random_state</span><span class="p">)</span>
 
@@ -509,6 +1001,105 @@ TrainSTLSQ<span class="p">(</span><span class="n">X</span><span class="p">,</spa
 <p>Performs additional thresholding on coefficient result from estimator. Basically
     a thin wrapper around the given estimator. </p>
 <div class="doc doc-children">
+<div class="doc doc-object doc-method">
+<h3 class="doc doc-heading" id="deepymod_torch.model.sparse_estimators.Threshold.fit">
+<code class="highlight language-python">
+fit<span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> </code>
+</h3>
+<div class="doc doc-contents">
+<p>[summary]</p>
+<p><strong>Parameters:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>X</code></td>
+<td><code>ndarray</code></td>
+<td>
+<p>[description]</p>
+</td>
+<td><em>required</em></td>
+</tr>
+<tr>
+<td><code>y</code></td>
+<td><code>ndarray</code></td>
+<td>
+<p>[description]</p>
+</td>
+<td><em>required</em></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ndarray</code></td>
+<td>
+<p>np.ndarray: [description]</p>
+</td>
+</tr>
+</tbody>
+</table>
+<details class="quote">
+<summary>Source code in <code>deepymod_torch/model/sparse_estimators.py</code></summary>
+<table class="highlighttable">
+<tr>
+<td class="linenos">
+<div class="linenodiv">
+<pre><span></span>53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66</pre>
+</div>
+</td>
+<td class="code">
+<div class="highlight">
+<pre><span></span><code><span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+    <span class="sd">"""[summary]</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        X (np.ndarray): [description]</span>
+<span class="sd">        y (np.ndarray): [description]</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        np.ndarray: [description]</span>
+<span class="sd">    """</span>
+    <span class="n">coeffs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimator</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span><span class="o">.</span><span class="n">coef_</span>
+    <span class="n">coeffs</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">coeffs</span><span class="p">)</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">threshold</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+    <span class="k">return</span> <span class="n">coeffs</span>
+</code></pre>
+</div>
+</td>
+</tr>
+</table>
+</details>
+</div>
+</div>
 </div>
 </div>
 </div>

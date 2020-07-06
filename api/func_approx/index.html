@@ -347,7 +347,10 @@
 <code>NN</code>
 </h2>
 <div class="doc doc-contents">
-<p>Neural network function approximator.</p>
+<p>[summary]</p>
+<pre><code>!!! args
+    nn ([type]): [description]
+</code></pre>
 <div class="doc doc-children">
 <div class="doc doc-object doc-method">
 <h3 class="doc doc-heading" id="deepymod_torch.model.func_approx.NN.build_network">
@@ -377,9 +380,9 @@ build_network<span class="p">(</span><span class="bp">self</span><span class="p"
 </tr>
 <tr>
 <td><code>n_hidden</code></td>
-<td><code>list[int]</code></td>
+<td><code>List[int]</code></td>
 <td>
-<p>Number of neurons in each layer. </p>
+<p>Number of neurons in each layer.</p>
 </td>
 <td><em>required</em></td>
 </tr>
@@ -403,9 +406,9 @@ build_network<span class="p">(</span><span class="bp">self</span><span class="p"
 </thead>
 <tbody>
 <tr>
-<td><code>torch.Sequential</code></td>
+<td><code>Sequential</code></td>
 <td>
-<p>Pytorch module</p>
+<p>torch.Sequential: Pytorch module</p>
 </td>
 </tr>
 </tbody>
@@ -416,35 +419,35 @@ build_network<span class="p">(</span><span class="bp">self</span><span class="p"
 <tr>
 <td class="linenos">
 <div class="linenodiv">
-<pre><span></span>15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
+<pre><span></span>27
 28
 29
 30
 31
 32
-33</pre>
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45</pre>
 </div>
 </td>
 <td class="code">
 <div class="highlight">
-<pre><span></span><code><span class="k">def</span> <span class="nf">build_network</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_in</span><span class="p">,</span> <span class="n">n_hidden</span><span class="p">,</span> <span class="n">n_out</span><span class="p">):</span>
+<pre><span></span><code><span class="k">def</span> <span class="nf">build_network</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_in</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">n_hidden</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">n_out</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">:</span>
     <span class="sd">""" Constructs a feed-forward neural network.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        n_in (int): Number of input features.</span>
-<span class="sd">        n_hidden (list[int]): Number of neurons in each layer. </span>
+<span class="sd">        n_hidden (list[int]): Number of neurons in each layer.</span>
 <span class="sd">        n_out (int): Number of output features.</span>
 
 <span class="sd">    Returns:</span>
@@ -472,26 +475,74 @@ build_network<span class="p">(</span><span class="bp">self</span><span class="p"
 forward<span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">)</span> </code>
 </h3>
 <div class="doc doc-contents">
-<p>Defines the computation performed at every call.</p>
-<p>Should be overridden by all subclasses.</p>
-<p>.. note::
-    Although the recipe for forward pass needs to be defined within
-    this function, one should call the :class:<code>Module</code> instance afterwards
-    instead of this since the former takes care of running the
-    registered hooks while the latter silently ignores them.</p>
+<p>[summary]</p>
+<p><strong>Parameters:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>input</code></td>
+<td><code>Tensor</code></td>
+<td>
+<p>[description]</p>
+</td>
+<td><em>required</em></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Tensor</code></td>
+<td>
+<p>torch.Tensor: [description]</p>
+</td>
+</tr>
+</tbody>
+</table>
 <details class="quote">
 <summary>Source code in <code>deepymod_torch/model/func_approx.py</code></summary>
 <table class="highlighttable">
 <tr>
 <td class="linenos">
 <div class="linenodiv">
-<pre><span></span>12
-13</pre>
+<pre><span></span>16
+17
+18
+19
+20
+21
+22
+23
+24
+25</pre>
 </div>
 </td>
 <td class="code">
 <div class="highlight">
 <pre><span></span><code><span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+    <span class="sd">"""[summary]</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        input (torch.Tensor): [description]</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        torch.Tensor: [description]</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">network</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>
 </code></pre>
 </div>
