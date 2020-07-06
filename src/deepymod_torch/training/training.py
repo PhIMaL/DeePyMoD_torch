@@ -2,9 +2,9 @@ import torch
 import time
 from math import pi
 
-from deepymod_torch.utils.tensorboard import Tensorboard
-from deepymod_torch.utils.output import progress
-from deepymod_torch.training.convergence import Convergence
+from ..utils.tensorboard import Tensorboard
+from ..utils.output import progress
+from .convergence import Convergence
 
 def train(model, data, target, optimizer, sparsity_scheduler, log_dir=None, max_iterations=10000, **convergence_kwargs):
     '''Function to train model.'''
@@ -22,7 +22,7 @@ def train(model, data, target, optimizer, sparsity_scheduler, log_dir=None, max_
         MSE = torch.mean((prediction - target)**2, dim=0)  # loss per output
         Reg = torch.stack([torch.mean((dt - theta @ coeff_vector)**2)
                            for dt, theta, coeff_vector in zip(time_derivs, sparse_thetas, constraint_coeffs)])
-        loss = torch.sum(2 * torch.log(2 * pi * MSE) + Reg / (MSE + 1e-5))  # 1e-5 for numerical stability
+        loss = torch.sum(2 * torch.log(2 * pi * MSE) + Reg / (MSE + 1e-6))  # 1e-5 for numerical stability
 
         # Optimizer step
         optimizer.zero_grad()

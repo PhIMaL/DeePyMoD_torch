@@ -3,7 +3,7 @@ import torch
 from torch.autograd import grad
 from itertools import combinations, product
 from functools import reduce
-from deepymod_torch import Library
+from .deepmod import Library
 
 
 # ==================== Library helper functions =======================

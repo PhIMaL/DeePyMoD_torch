@@ -3,7 +3,7 @@ We keep the API in line with scikit learn (mostly), so scikit learn can also be 
 See scikitlearn.linear_models for applicable estimators.'''
 
 import numpy as np
-from deepymod_torch import Estimator
+from .deepmod import Estimator
 from sklearn.cluster import KMeans
 from pysindy.optimizers import STLSQ
 from sklearn.linear_model import LassoCV
