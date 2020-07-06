@@ -63,3 +63,11 @@ tests/runs/
 site/
 
 tests/data/.DS_Store
+
+.ipynb_checkpoints/
+
+config/
+
+.DS_Store
+
+src/__pycache__/
