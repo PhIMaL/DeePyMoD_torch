@@ -26,13 +26,18 @@ class Library(nn.Module):
     ''' Library layer which calculates and normalizes the library.'''
     def __init__(self):
         super().__init__()
-        self.norm = None
+        self.norms = None
 
     def forward(self, input):
         time_derivs, theta = self.library(input)
-        self.norm = torch.norm(theta, dim=0, keepdim=True)
-        normed_theta = theta / self.norm  # we pass on the normed thetas
-        return time_derivs, normed_theta
+        theta_norm = torch.norm(theta, dim=0, keepdim=True)
+        time_deriv_norms = [torch.norm(dt) for dt in time_derivs]
+
+        normed_theta = theta / theta_norm
+        normed_time_derivs = [dt / norm for dt, norm in zip(time_derivs, time_deriv_norms)]
+        self.norms = [theta_norm / dt_norm for dt_norm in time_deriv_norms]
+       
+        return normed_time_derivs, normed_theta
 
 
 class Constraint(nn.Module):
