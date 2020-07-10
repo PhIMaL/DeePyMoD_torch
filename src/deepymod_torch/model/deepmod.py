@@ -73,8 +73,9 @@ class Estimator(nn.Module,  metaclass=ABCMeta):
         Returns:
             TensorList: [description]
         """
+        normed_time_derivs = [time_deriv / torch.norm(time_deriv) for time_deriv in time_derivs]
         self.coeff_vectors = [self.fit(theta.detach().cpu(), time_deriv.squeeze().detach().cpu())
-                              for theta, time_deriv in zip(thetas, time_derivs)]
+                              for theta, time_deriv in zip(thetas, normed_time_derivs)]
         sparsity_masks = [torch.tensor(coeff_vector != 0.0, dtype=torch.bool)
                           for coeff_vector in self.coeff_vectors]
 
