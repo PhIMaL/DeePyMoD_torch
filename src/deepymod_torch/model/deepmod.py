@@ -104,14 +104,10 @@ class Library(nn.Module):
             Tuple[TensorList, TensorList]: [description]
         """
         time_derivs, thetas = self.library(input)
-        theta_norms = [torch.norm(theta, dim=0, keepdim=True) for theta in thetas]
-        time_deriv_norms = [torch.norm(dt) for dt in time_derivs]
+        self.norms = [torch.norm(theta, dim=0, keepdim=True) for theta in thetas]
+        normed_thetas = [theta / norm for theta, norm in zip(thetas, self.norms)]
 
-        normed_thetas = [theta / norm for theta, norm in zip(thetas, theta_norms)]
-        normed_time_derivs = [dt / norm for dt, norm in zip(time_derivs, time_deriv_norms)]
-        self.norms = [theta_norm / dt_norm for theta_norm, dt_norm in zip(theta_norms, time_deriv_norms)]
-
-        return normed_time_derivs, normed_thetas
+        return time_derivs, normed_thetas
 
     @abstractmethod
     def library(self, input: Tuple[torch.Tensor, torch.Tensor]) -> Tuple[TensorList, TensorList]: pass
