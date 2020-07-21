@@ -62,6 +62,7 @@ class Estimator(nn.Module,  metaclass=ABCMeta):
     """
     def __init__(self) -> None:
         super().__init__()
+        self.coeff_vectors = None
 
     def forward(self, thetas: TensorList, time_derivs: TensorList) -> TensorList:
         """[summary]

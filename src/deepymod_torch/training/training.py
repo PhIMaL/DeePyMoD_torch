@@ -57,7 +57,13 @@ def train(model: DeepMoD,
         if iteration % 25 == 0:
             progress(iteration, start_time, max_iterations, loss.item(),
                      torch.sum(MSE).item(), torch.sum(Reg).item(), torch.sum(l1_norm).item())
-            board.write(iteration, loss, MSE, Reg, l1_norm, model.constraint_coeffs(sparse=True, scaled=True), model.constraint_coeffs(sparse=True, scaled=False))
+
+            if model.estimator_coeffs() is None:
+                estimator_coeff_vectors = [torch.zeros_like(coeff) for coeff in model.constraint_coeffs(sparse=True, scaled=False)] # It doesnt exist before we start sparsity, so we use zeros
+            else:
+                estimator_coeff_vectors = model.estimator_coeffs()
+
+            board.write(iteration, loss, MSE, Reg, l1_norm, model.constraint_coeffs(sparse=True, scaled=True), model.constraint_coeffs(sparse=True, scaled=False), estimator_coeff_vectors)
             
         # ================== Validation and sparsity =============
         # Updating sparsity and or convergence
