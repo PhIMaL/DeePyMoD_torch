@@ -30,7 +30,7 @@ def train(model: DeepMoD,
         max_iterations (int, optional): [description]. Defaults to 10000.
     """
     start_time = time.time()
-    number_of_terms = [coeff_vec.shape[0] for coeff_vec in model(data)[3]]
+    number_of_terms = [theta.shape[1] for theta in model(data)[2]]
     board = Tensorboard(number_of_terms, log_dir)  # initializing custom tb board
 
     # Training
@@ -38,11 +38,11 @@ def train(model: DeepMoD,
     print('| Iteration | Progress | Time remaining |     Loss |      MSE |      Reg |    L1 norm |')
     for iteration in np.arange(0, max_iterations + 1):
         # ================== Training Model ============================
-        prediction, time_derivs, sparse_thetas, thetas, constraint_coeffs = model(data)
+        prediction, time_derivs, thetas = model(data)
 
         MSE = torch.mean((prediction - target)**2, dim=0)  # loss per output
         Reg = torch.stack([torch.mean((dt - theta @ coeff_vector)**2)
-                           for dt, theta, coeff_vector in zip(time_derivs, sparse_thetas, model.constraint_coeffs(scaled=False, sparse=False))])
+                           for dt, theta, coeff_vector in zip(time_derivs, thetas, model.constraint_coeffs(scaled=False, sparse=True))])
         loss = torch.sum(2 * torch.log(2 * pi * MSE) + Reg / (MSE + 1e-6))  # 1e-5 for numerical stability
 
         # Optimizer step
@@ -67,7 +67,7 @@ def train(model: DeepMoD,
             with torch.no_grad():
                 model.constraint.sparsity_masks = model.sparse_estimator(thetas, time_derivs)
                 sparsity_scheduler.reset()
-                print(model.constraint.sparsity_masks)
+                print(model.sparsity_masks)
 
         # Checking convergence
         convergence(iteration, torch.sum(l1_norm))
