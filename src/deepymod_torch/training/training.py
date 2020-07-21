@@ -30,8 +30,7 @@ def train(model: DeepMoD,
         max_iterations (int, optional): [description]. Defaults to 10000.
     """
     start_time = time.time()
-    number_of_terms = [theta.shape[1] for theta in model(data)[2]]
-    board = Tensorboard(number_of_terms, log_dir)  # initializing custom tb board
+    board = Tensorboard(log_dir)  # initializing tb board
 
     # Training
     convergence = Convergence(**convergence_kwargs)
@@ -74,5 +73,3 @@ def train(model: DeepMoD,
         if convergence.converged is True:
             print('Algorithm converged. Stopping training.')
             break
-
-    board.close()
