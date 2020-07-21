@@ -36,7 +36,7 @@ X_train, y_train = dataset.create_dataset(x_grid.reshape(-1, 1), t_grid.reshape(
 # Configuring model
 network = NN(2, [30, 30, 30, 30, 30], 1)  # Function approximator
 library = Library1D(poly_order=2, diff_order=3) # Library function
-estimator = Clustering() # Sparse estimator 
+estimator = Threshold(0.1) #Clustering() # Sparse estimator 
 constraint = LeastSquares() # How to constrain
 model = DeepMoD(network, library, estimator, constraint) # Putting it all in the model
 
