@@ -73,9 +73,14 @@ class Estimator(nn.Module,  metaclass=ABCMeta):
         Returns:
             TensorList: [description]
         """
-        normed_time_derivs = [time_deriv / torch.norm(time_deriv) for time_deriv in time_derivs]
-        self.coeff_vectors = [self.fit(theta.detach().cpu(), time_deriv.squeeze().detach().cpu())
-                              for theta, time_deriv in zip(thetas, normed_time_derivs)]
+
+        # we first normalize theta and the time deriv
+        with torch.no_grad():
+            normed_time_derivs = [(time_deriv / torch.norm(time_deriv)).detach().cpu() for time_deriv in time_derivs]
+            normed_thetas = [(theta / torch.norm(theta, dim=0, keepdim=True)).detach().cpu() for theta in thetas]
+        
+        self.coeff_vectors = [self.fit(theta, time_deriv.squeeze())
+                              for theta, time_deriv in zip(normed_thetas, normed_time_derivs)]
         sparsity_masks = [torch.tensor(coeff_vector != 0.0, dtype=torch.bool)
                           for coeff_vector in self.coeff_vectors]
 
@@ -93,7 +98,6 @@ class Library(nn.Module):
     """
     def __init__(self) -> None:
         super().__init__()
-        self.norms: TensorList = None
 
     def forward(self, input: Tuple[TensorList, TensorList]) -> Tuple[TensorList, TensorList]:
         """[summary]
@@ -105,10 +109,7 @@ class Library(nn.Module):
             Tuple[TensorList, TensorList]: [description]
         """
         time_derivs, thetas = self.library(input)
-        self.norms = [torch.norm(theta, dim=0, keepdim=True) for theta in thetas]
-        normed_thetas = [theta / norm for theta, norm in zip(thetas, self.norms)]
-
-        return time_derivs, normed_thetas
+        return time_derivs, thetas
 
     @abstractmethod
     def library(self, input: Tuple[torch.Tensor, torch.Tensor]) -> Tuple[TensorList, TensorList]: pass

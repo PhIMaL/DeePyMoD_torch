@@ -50,24 +50,11 @@ def train(model: DeepMoD,
         loss.backward()
         optimizer.step()
 
-        # ====================== Logging =======================
-        # Write progress to command line and tensorboard
-        l1_norm = torch.stack([torch.sum(torch.abs(coeff_vector)) for coeff_vector in constraint_coeffs])
-        if iteration % 25 == 0:
-            progress(iteration, start_time, max_iterations, loss.item(),
-                     torch.sum(MSE).item(), torch.sum(Reg).item(), torch.sum(l1_norm).item())
-
-            # We pad the sparse vectors with zeros so they get written correctly)
-            constraint_coeff_vectors = [torch.zeros(mask.size()).masked_scatter_(mask, coeff_vector.detach().squeeze())
-                                        for mask, coeff_vector
-                                        in zip(model.constraint.sparsity_masks, constraint_coeffs)]
-            unscaled_constraint_coeff_vectors = [torch.zeros(mask.size()).masked_scatter_(mask, coeff_vector.detach().squeeze()) / norm.squeeze()
-                                                 for mask, coeff_vector, norm
-                                                 in zip(model.constraint.sparsity_masks, constraint_coeffs, model.library.norms)]
-
-            board.write(iteration, loss, MSE, Reg, l1_norm, constraint_coeff_vectors, unscaled_constraint_coeff_vectors)
-
         # ================== Validation and sparsity =============
+        # We calculate the normalization factor and the l1_norm
+        coeff_norms = [(torch.norm(time_deriv) / torch.norm(theta, dim=0, keepdim=True)).detach().squeeze() for time_deriv, theta in zip(time_derivs, sparse_thetas)]
+        l1_norm = torch.stack([torch.sum(torch.abs(coeff_vector.squeeze() / norm)) for coeff_vector, norm in zip(constraint_coeffs, coeff_norms)])
+
         # Updating sparsity and or convergence
         sparsity_scheduler(iteration, torch.sum(l1_norm))
         if sparsity_scheduler.apply_sparsity is True:
@@ -81,5 +68,22 @@ def train(model: DeepMoD,
         if convergence.converged is True:
             print('Algorithm converged. Stopping training.')
             break
+
+    
+        # ====================== Logging =======================
+        # Write progress to command line and tensorboard
+        if iteration % 25 == 0:
+            progress(iteration, start_time, max_iterations, loss.item(),
+                     torch.sum(MSE).item(), torch.sum(Reg).item(), torch.sum(l1_norm).item())
+
+            # We pad the sparse vectors with zeros so they get written correctly)
+            unscaled_constraint_coeff_vectors = [torch.zeros(mask.size()).masked_scatter_(mask, coeff_vector.detach().squeeze())
+                                                 for mask, coeff_vector
+                                                 in zip(model.constraint.sparsity_masks, constraint_coeffs)]
+            constraint_coeff_vectors = [torch.zeros(mask.size()).masked_scatter_(mask, coeff_vector.detach().squeeze() / norm)
+                                        for mask, coeff_vector, norm
+                                        in zip(model.constraint.sparsity_masks, constraint_coeffs, coeff_norms)]
+
+            board.write(iteration, loss, MSE, Reg, l1_norm, constraint_coeff_vectors, unscaled_constraint_coeff_vectors)
 
     board.close()
