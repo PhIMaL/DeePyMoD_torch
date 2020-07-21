@@ -32,7 +32,7 @@ class Constraint(nn.Module, metaclass=ABCMeta):
         time_derivs, thetas = input
 
         if self.sparsity_masks is None:
-            self.sparsity_masks = [torch.ones(theta.shape[1], dtype=torch.bool) for theta in thetas]
+            self.sparsity_masks = [torch.ones(theta.shape[1], dtype=torch.bool).to(theta.device) for theta in thetas]
 
         sparse_thetas = self.apply_mask(thetas)
         self.coeff_vectors = self.calculate_coeffs(sparse_thetas, time_derivs)
@@ -74,7 +74,7 @@ class Estimator(nn.Module,  metaclass=ABCMeta):
         Returns:
             TensorList: [description]
         """
-
+        
         # we first normalize theta and the time deriv
         with torch.no_grad():
             normed_time_derivs = [(time_deriv / torch.norm(time_deriv)).detach().cpu() for time_deriv in time_derivs]
@@ -82,7 +82,7 @@ class Estimator(nn.Module,  metaclass=ABCMeta):
         
         self.coeff_vectors = [self.fit(theta, time_deriv.squeeze())[:, None]
                               for theta, time_deriv in zip(normed_thetas, normed_time_derivs)]
-        sparsity_masks = [torch.tensor(coeff_vector != 0.0, dtype=torch.bool).squeeze()
+        sparsity_masks = [torch.tensor(coeff_vector != 0.0, dtype=torch.bool).squeeze().to(thetas[0].device) # move to gpu if required
                           for coeff_vector in self.coeff_vectors]
 
         return sparsity_masks
@@ -162,7 +162,7 @@ class DeepMoD(nn.Module):
         if scaled:
             coeff_vectors = [coeff / norm[mask][:, None] for coeff, norm, mask in zip(coeff_vectors, self.library.norms, self.sparsity_masks)]
         if sparse:
-            coeff_vectors = [torch.zeros((mask.shape[0], 1)).masked_scatter_(mask[:, None], coeff_vector)
+            coeff_vectors = [torch.zeros((mask.shape[0], 1)).to(coeff_vector.device).masked_scatter_(mask[:, None], coeff_vector)
                              for mask, coeff_vector
                              in zip(self.sparsity_masks, coeff_vectors)]
         return coeff_vectors
