@@ -97,7 +97,8 @@ class Library(nn.Module):
         nn ([type]): [description]
     """
     def __init__(self) -> None:
-        super().__init__()
+        super().__init__()  
+        self.norms = None
 
     def forward(self, input: Tuple[TensorList, TensorList]) -> Tuple[TensorList, TensorList]:
         """[summary]
@@ -109,6 +110,7 @@ class Library(nn.Module):
             Tuple[TensorList, TensorList]: [description]
         """
         time_derivs, thetas = self.library(input)
+        self.norms = [(torch.norm(time_deriv) / torch.norm(theta, dim=0, keepdim=True)).detach().squeeze() for time_deriv, theta in zip(time_derivs, thetas)]
         return time_derivs, thetas
 
     @abstractmethod
@@ -145,3 +147,22 @@ class DeepMoD(nn.Module):
         time_derivs, thetas = self.library((prediction, input))
         sparse_thetas, constraint_coeffs = self.constraint((time_derivs, thetas))
         return prediction, time_derivs, sparse_thetas, thetas, constraint_coeffs
+
+    def sparsity_masks(self):
+        return self.constraint.sparsity_masks
+    
+    def estimator_coeffs(self):
+        coeff_vectors = self.sparse_estimator.coeff_vectors
+        return coeff_vectors
+
+    def constraint_coeffs(self, scaled=False, sparse=False):
+        coeff_vectors = self.constraint.coeff_vectors
+        if scaled:
+            coeff_vectors = [coeff / norm[mask][:, None] for coeff, norm, mask in zip(coeff_vectors, self.library.norms, self.sparsity_masks())]
+        if sparse:
+            coeff_vectors = [torch.zeros((mask.shape[0], 1)).masked_scatter_(mask[:, None], coeff_vector)
+                             for mask, coeff_vector
+                             in zip(self.sparsity_masks(), coeff_vectors)]
+        return coeff_vectors
+
+
