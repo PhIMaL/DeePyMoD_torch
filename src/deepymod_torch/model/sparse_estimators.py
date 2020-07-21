@@ -35,7 +35,7 @@ class Base(Estimator):
         Returns:
             np.ndarray: [description]
         """
-        coeffs = self.estimator.fit(X, y / np.linalg.norm(y)).coef_
+        coeffs = self.estimator.fit(X, y).coef_
         return coeffs
 
 
@@ -60,7 +60,7 @@ class Threshold(Estimator):
         Returns:
             np.ndarray: [description]
         """
-        coeffs = self.estimator.fit(X, y / np.linalg.norm(y)).coef_
+        coeffs = self.estimator.fit(X, y).coef_
         coeffs[np.abs(coeffs) < self.threshold] = 0.0
 
         return coeffs
@@ -89,7 +89,7 @@ class Clustering(Estimator):
          Returns:
              np.ndarray: [description]
         """
-        coeffs = self.estimator.fit(X, y / np.linalg.norm(y)).coef_[:, None]  # sklearn returns 1D
+        coeffs = self.estimator.fit(X, y).coef_[:, None]  # sklearn returns 1D
         clusters = self.kmeans.fit_predict(np.abs(coeffs)).astype(np.bool)
 
         # make sure terms to keep are 1 and to remove are 0
