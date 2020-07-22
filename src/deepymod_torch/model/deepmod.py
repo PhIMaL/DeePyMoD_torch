@@ -76,12 +76,8 @@ class Estimator(nn.Module,  metaclass=ABCMeta):
         """
         
         # we first normalize theta and the time deriv
-        with torch.no_grad():
-            normed_time_derivs = [(time_deriv / torch.norm(time_deriv)).detach().cpu() for time_deriv in time_derivs]
-            normed_thetas = [(theta / torch.norm(theta, dim=0, keepdim=True)).detach().cpu() for theta in thetas]
-        
-        self.coeff_vectors = [self.fit(theta, time_deriv.squeeze())[:, None]
-                              for theta, time_deriv in zip(normed_thetas, normed_time_derivs)]
+        self.coeff_vectors = [self.fit(theta.detach(), time_deriv.detach().squeeze())[:, None]
+                              for theta, time_deriv in zip(thetas, time_derivs)]
         sparsity_masks = [torch.tensor(coeff_vector != 0.0, dtype=torch.bool).squeeze().to(thetas[0].device) # move to gpu if required
                           for coeff_vector in self.coeff_vectors]
 
@@ -111,8 +107,14 @@ class Library(nn.Module):
             Tuple[TensorList, TensorList]: [description]
         """
         time_derivs, thetas = self.library(input)
-        self.norms = [(torch.norm(time_deriv) / torch.norm(theta, dim=0, keepdim=True)).detach().squeeze() for time_deriv, theta in zip(time_derivs, thetas)]
-        return time_derivs, thetas
+        theta_norms = [torch.norm(theta, dim=0) for theta in thetas]
+        time_deriv_norms = [torch.norm(dt, dim=0) for dt in time_derivs]
+
+        normed_thetas = [theta / norm for theta, norm in zip(thetas, theta_norms)]
+        normed_time_derivs = [dt / norm for dt, norm in zip(time_derivs, time_deriv_norms)]
+        self.norms = [theta_norm / dt_norm for theta_norm, dt_norm in zip(theta_norms, time_deriv_norms)]
+
+        return normed_time_derivs, normed_thetas
 
     @abstractmethod
     def library(self, input: Tuple[torch.Tensor, torch.Tensor]) -> Tuple[TensorList, TensorList]: pass
@@ -159,7 +161,7 @@ class DeepMoD(nn.Module):
 
     def constraint_coeffs(self, scaled=False, sparse=False):
         coeff_vectors = self.constraint.coeff_vectors
-        if scaled:
+        if scaled is False:
             coeff_vectors = [coeff / norm[mask][:, None] for coeff, norm, mask in zip(coeff_vectors, self.library.norms, self.sparsity_masks)]
         if sparse:
             coeff_vectors = [torch.zeros((mask.shape[0], 1)).to(coeff_vector.device).masked_scatter_(mask[:, None], coeff_vector)
