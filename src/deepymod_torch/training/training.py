@@ -79,3 +79,4 @@ def train(model: DeepMoD,
         if convergence.converged is True:
             print('Algorithm converged. Stopping training.')
             break
+    board.close()
