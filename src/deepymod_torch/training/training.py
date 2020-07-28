@@ -17,6 +17,7 @@ def train(model: DeepMoD,
           sparsity_scheduler,
           log_dir: Optional[str] = None,
           max_iterations: int = 10000,
+          write_iterations: int = 25,
           **convergence_kwargs) -> None:
     """[summary]
 
@@ -54,7 +55,7 @@ def train(model: DeepMoD,
         l1_norm = torch.sum(torch.abs(torch.cat(model.constraint_coeffs(sparse=True, scaled=True), dim=1)), dim=0)
 
         # Write progress to command line and tensorboard
-        if iteration % 25 == 0:
+        if iteration % write_iterations == 0:
             progress(iteration, start_time, max_iterations, loss.item(),
                      torch.sum(MSE).item(), torch.sum(Reg).item(), torch.sum(l1_norm).item())
 
