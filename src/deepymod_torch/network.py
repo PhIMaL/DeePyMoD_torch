@@ -3,6 +3,16 @@ import torch.nn as nn
 
 
 class Library(nn.Module):
+    """
+    A module that represents a library of functions used in the DeepMoD algorithm.
+
+    Args:
+        library_func (callable): A function that generates the library of functions.
+        library_args (dict): A dictionary of arguments to be passed to the library function.
+
+    Returns:
+        tuple: A tuple containing the time derivative list and the theta matrix.
+    """
     def __init__(self, library_func, library_args={}):
         super().__init__()
         self.library_func = library_func
@@ -14,6 +24,7 @@ class Library(nn.Module):
 
 
 class Fitting(nn.Module):
+    # TODO: write a docstring
     def __init__(self, n_terms, n_out):
         super().__init__()
         self.coeff_vector = nn.ParameterList([torch.nn.Parameter(torch.rand((n_terms, 1), dtype=torch.float32)) for _ in torch.arange(n_out)])

@@ -5,7 +5,7 @@ from itertools import combinations, product
 from functools import reduce
 
 def library_poly(prediction, max_order):
-    # Calculate the polynomes of u
+    # Calculate the polynomials of u
     u = torch.ones_like(prediction)
     for order in np.arange(1, max_order+1):
         u = torch.cat((u, u[:, order-1:order] * prediction), dim=1)
@@ -14,6 +14,19 @@ def library_poly(prediction, max_order):
 
 
 def library_deriv(data, prediction, max_order):
+    """
+    Computes the time derivative and up to max_order spatial derivatives of the prediction tensor with respect to the data tensor.
+    
+    Args:
+        data (torch.Tensor): Input tensor of shape (batch_size, input_dim).
+        prediction (torch.Tensor): Output tensor of shape (batch_size, output_dim).
+        max_order (int): Maximum order of spatial derivatives to compute.
+        
+    Returns:
+        time_deriv (torch.Tensor): Time derivative of the prediction tensor with respect to the data tensor.
+        du (torch.Tensor): Tensor of shape (batch_size, (max_order+1)*input_dim) containing the computed spatial derivatives.
+    """
+    
     dy = grad(prediction, data, grad_outputs=torch.ones_like(prediction), create_graph=True)[0]
     time_deriv = dy[:, 0:1]
     
@@ -29,6 +42,27 @@ def library_deriv(data, prediction, max_order):
 
 
 def library_1D_in(input, poly_order, diff_order):
+    """
+    Computes the library matrix for a spatial 1D input signal, given the input data, the maximum polynomial order and the maximum derivative order.
+    
+    Parameters
+    ----------
+    input : tuple of two torch.Tensor
+        A tuple containing the prediction tensor and the data tensor, both of shape (samples, features).
+    poly_order : int
+        The maximum polynomial order to include in the library.
+    diff_order : int
+        The maximum derivative order to include in the library.
+    
+    Returns
+    -------
+    time_deriv_list : list of torch.Tensor
+        A list containing the time derivative tensors for each output feature, each of shape (samples, 1).
+    theta : torch.Tensor
+        The library matrix, of shape (samples, total_terms), where total_terms is the total number of terms in the library.
+    """
+def library_1D_in(input, poly_order, diff_order):
+    
     prediction, data = input
     poly_list = []
     deriv_list = []
