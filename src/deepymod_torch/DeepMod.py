@@ -4,7 +4,7 @@ from deepymod_torch.network import Fitting, Library
 
 
 class DeepMod(nn.Module):
-    '''A PyTorch module for data-driven discovery of partial differential equations.
+    '''Module subclass for data-driven discovery of partial differential equations.
 
     This module implements a neural network architecture for discovering the governing equations of a system
     from data. The architecture consists of a fully connected neural network followed by a library of candidate
@@ -12,9 +12,9 @@ class DeepMod(nn.Module):
     function and its arguments.
 
     Args:
-        n_in (int): Number of input features.
+        n_in (int): Number of input features: the number of temporal+spatial dimensions.
         hidden_dims (list of int): List of dimensions for the hidden layers of the neural network.
-        n_out (int): Number of output features.
+        n_out (int): Number of output features (the number of equations to discover).
         library_function (callable): Function that generates the library of candidate functions.
         library_args (tuple or dict): Arguments to pass to the library function.
 
@@ -25,7 +25,7 @@ class DeepMod(nn.Module):
     '''
     def __init__(self, n_in, hidden_dims, n_out, library_function, library_args):
         super().__init__()
-        self.network = self.build_network(n_in, hidden_dims, n_out)
+        self.network = self.build_network(n_in, hidden_dims, n_out) # to make predictions about the dynamical field (variable)
         self.library = Library(library_function, library_args)
         self.fit = self.build_fit_layer(n_in, n_out, library_function, library_args)
 
@@ -43,9 +43,11 @@ class DeepMod(nn.Module):
                 - sparse_theta (torch.Tensor): Sparse theta tensor of shape (n_terms, input_dim).
                 - coeff_vector (torch.Tensor): Coefficient vector tensor of shape (n_terms, output_dim).
         """
-        prediction = self.network(input)
-        time_deriv, theta = self.library((prediction, input))
-        sparse_theta, coeff_vector = self.fit(theta)
+        prediction = self.network(input) # predict the fields as a given location (input)
+        time_deriv, theta = self.library((prediction, input)) # library function returns time_deriv and theta (equation (4) of the manuscript)
+        sparse_theta, coeff_vector = self.fit(theta) # Note this attribute `fit` of type `Fitting` not a method of NN
+        # sparse_theta is theta with sparsity mask applied (extracting relevant terms)
+        # coeff_vector will play role in the loss function (see `losses.py`) which explains how it is optimized
         return prediction, time_deriv, sparse_theta, coeff_vector
 
     def build_network(self, n_in, hidden_dims, n_out):
@@ -73,7 +75,7 @@ class DeepMod(nn.Module):
 
     def build_fit_layer(self, n_in, n_out, library_function, library_args):
         """
-        Builds and returns a Fitting layer for the DeepMoD model.
+        Builds and returns a Fitting layer for the DeepMoD model which is basically the sparse regression layer which applies sparsity mask
 
         Args:
             n_in (int): Number of input features.
@@ -85,7 +87,7 @@ class DeepMod(nn.Module):
             Fitting: A Fitting layer with the appropriate number of terms for the given input and output sizes.
         """
         sample_input = torch.ones((1, n_in), dtype=torch.float32, requires_grad=True)
-        n_terms = self.library((self.network(sample_input), sample_input))[1].shape[1] # do sample pass to infer shapes
+        n_terms = self.library((self.network(sample_input), sample_input))[1].shape[1] # do sample pass to infer shapes: number of terms in the equation
         fit_layer = Fitting(n_terms, n_out)
 
         return fit_layer
